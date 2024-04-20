@@ -21,3 +21,6 @@ geolocator_apple=/Users/forrestdpark/.pub-cache/hosted/pub.dev/geolocator_apple-
 geolocator_web=/Users/forrestdpark/.pub-cache/hosted/pub.dev/geolocator_web-3.0.0/
 geolocator_windows=/Users/forrestdpark/.pub-cache/hosted/pub.dev/geolocator_windows-0.2.3/
 sqflite=/Users/forrestdpark/.pub-cache/hosted/pub.dev/sqflite-2.3.3/
+webview_flutter=/Users/forrestdpark/.pub-cache/hosted/pub.dev/webview_flutter-4.7.0/
+webview_flutter_android=/Users/forrestdpark/.pub-cache/hosted/pub.dev/webview_flutter_android-3.16.0/
+webview_flutter_wkwebview=/Users/forrestdpark/.pub-cache/hosted/pub.dev/webview_flutter_wkwebview-3.13.0/

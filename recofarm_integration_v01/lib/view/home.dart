@@ -5,6 +5,8 @@ import 'package:new_recofarm_app/view/login.dart';
 import 'package:new_recofarm_app/view/login_page.dart';
 import 'package:new_recofarm_app/view/mainview.dart';
 
+import 'web_view_page.dart';
+
 /*
  
   Description : 현재 Page는 앱 실행 이후 스플래쉬 다음에 나오는 로그인 화면으로 만들었으면 좋겠습니다.
@@ -36,10 +38,14 @@ class Home extends StatelessWidget {
                   Get.to(LoginScreen());
                 },
                 // Get 경로 알아서 하시면 됩니다. home.dart는 스플래시 화면 및 로그인 메뉴로 만들 생각입니다
-                child: const Text('Login 으로 가는 버튼 Test')),
+                child: const Text('Login')),
             ElevatedButton(
                 onPressed: () => Get.to(const MainView()),
-                child: const Text('main 화면 가는 button')),
+                child: const Text('main')),
+
+            ElevatedButton(
+              onPressed: () => Get.to(const WebViewPage()), 
+              child: "Webview")
           ],
         ),
       ),

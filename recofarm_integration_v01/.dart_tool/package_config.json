@@ -524,6 +524,30 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "webview_flutter",
+      "rootUri": "file:///Users/forrestdpark/.pub-cache/hosted/pub.dev/webview_flutter-4.7.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "webview_flutter_android",
+      "rootUri": "file:///Users/forrestdpark/.pub-cache/hosted/pub.dev/webview_flutter_android-3.16.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
+    },
+    {
+      "name": "webview_flutter_platform_interface",
+      "rootUri": "file:///Users/forrestdpark/.pub-cache/hosted/pub.dev/webview_flutter_platform_interface-2.10.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "webview_flutter_wkwebview",
+      "rootUri": "file:///Users/forrestdpark/.pub-cache/hosted/pub.dev/webview_flutter_wkwebview-3.13.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
       "name": "wkt_parser",
       "rootUri": "file:///Users/forrestdpark/.pub-cache/hosted/pub.dev/wkt_parser-2.0.0",
       "packageUri": "lib/",
@@ -542,7 +566,7 @@
       "languageVersion": "3.3"
     }
   ],
-  "generated": "2024-04-20T02:14:28.468533Z",
+  "generated": "2024-04-20T04:41:39.972350Z",
   "generator": "pub",
   "generatorVersion": "3.3.3"
 }
