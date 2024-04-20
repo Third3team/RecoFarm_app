@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:new_recofarm_app/firebase_options.dart';
+import 'package:new_recofarm_app/view/register_page.dart';
 import 'package:new_recofarm_app/view/splash_screen.dart';
 import 'view/home.dart';
 
@@ -64,7 +65,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         colorScheme: ColorScheme.fromSeed(
-            seedColor: Color.fromARGB(255, 254, 188, 66)),
+            seedColor: const Color.fromARGB(255, 233, 172, 30)),
         useMaterial3: true,
       ),
 
@@ -74,6 +75,12 @@ class MyApp extends StatelessWidget {
           name: '/home',
           page: () => const Home(),
           transition: Transition.circularReveal,
+          transitionDuration: const Duration(seconds :1)
+        ),
+        GetPage(
+          name: '/register',
+          page: () => const RegisterPage(),
+          transition: Transition.zoom,
           transitionDuration: const Duration(seconds :1)
         ),
       ],

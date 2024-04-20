@@ -31,7 +31,10 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Test'),
+        title: Text('Function pagess',
+        style: TextStyle(
+          fontSize: 50
+        ),)
       ),
       body: Center(
         child: Column(

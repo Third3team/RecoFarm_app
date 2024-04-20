@@ -18,6 +18,10 @@ import 'home.dart';
         - splash image 1, 2 삽입 
         - line progress indicator 
 
+        - 사용자가 로그인을 한번했으면 로그인페이지로 가지않고 메인페이지로 간다. 
+        - 사용자가 로그인을 하지 않았거나 처음 사용한다면 로그인 페이지로 간다. 
+        
+
 */
 
 class SplashScreen extends StatefulWidget {

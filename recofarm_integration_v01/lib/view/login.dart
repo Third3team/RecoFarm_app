@@ -1,15 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 
+/*
+  Description : Login Page 
+  Date        : 2024.04.20 Sat
+  Author      : Forrest DongGeun Park. (PDG)
+  Updates     : 
+	  2024.0420 Sat by pdg
+		  - 로그인 페이지  이메일이 아니라 아이디 비밀번호로 바꿈 
+      - 테마 및 글자 크기 변경함. 
+  Detail      : - 
+
+*/
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  TextEditingController userIdController = TextEditingController();
+  TextEditingController userPwController = TextEditingController();
 
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
@@ -61,105 +74,145 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('로그인'),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        title: Text(
+          '로그인',
+          style: TextStyle(
+              fontSize: 50,
+              color: Theme.of(context).colorScheme.onPrimaryContainer),
+        ),
       ),
       body: Stack(
         children: [
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(height: 60.0), // 상단 패딩 추가
+                const SizedBox(height: 50.0), // 상단 패딩 추가
+                Image.asset(
+                  "images/farmer.png",
+                  height: 200,
+                ),
                 Row(
                   children: [
-                    Expanded(flex: 1, child: Text("이메일")),
+                    const Expanded(flex: 1, child: Text("아이디")),
                     Expanded(
                       flex: 3,
-                      child: Container(
-                        child: TextFormField(
-                          style: TextStyle(
-                            fontSize: 12,
-                          ),
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 10.0),
-                            isDense: true,
-                            hintText: "이메일 입력",
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.red),
-                            ),
-                          ),
-                          keyboardType: TextInputType.emailAddress,
-                          controller: emailController,
+                      child: TextFormField(
+                        style: const TextStyle(
+                          fontSize: 25,
                         ),
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10.0, horizontal: 10.0),
+                          isDense: true,
+                          hintText: "아이디를 입력하세요.",
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                          ),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        controller: userIdController,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Row(
                   children: [
-                    Expanded(flex: 1, child: Text("비밀번호")),
+                    const Expanded(flex: 1, child: Text("비밀번호")),
                     Expanded(
                       flex: 3,
-                      child: Container(
-                        child: TextFormField(
-                          style: TextStyle(
-                            fontSize: 12,
-                          ),
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 10.0),
-                            isDense: true,
-                            hintText: "비밀번호 입력",
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.red),
-                            ),
-                          ),
-                          keyboardType: TextInputType.visiblePassword,
-                          obscureText: true,
-                          controller: passwordController,
+                      child: TextFormField(
+                        style: const TextStyle(
+                          fontSize: 25,
                         ),
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10.0, horizontal: 10.0),
+                          isDense: true,
+                          hintText: "비밀번호를 입력하세요.",
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                          ),
+                        ),
+                        keyboardType: TextInputType.visiblePassword,
+                        obscureText: true,
+                        controller: userPwController,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
-                ElevatedButton(
-                  child: Text('로그인'),
-                  onPressed: () async {
-                    setState(() {
-                      showLoading = true;
-                    });
+                SizedBox(height: 20),
 
-                    String email = emailController.text.trim();
-                    String password = passwordController.text.trim();
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        // 회원 가입 페이지로 이동
+                        Get.toNamed(
+                          '/register'
+                          
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)))),
+                      child: const Text('회원가입하기',
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 78, 101, 121)
+                      ),),
+                    ),
 
-                    if (email.isEmpty || password.isEmpty) {
-                      Fluttertoast.showToast(
-                        msg: "이메일과 비밀번호를 입력해 주세요.",
-                        toastLength: Toast.LENGTH_SHORT,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.red,
-                        fontSize: 16.0,
-                      );
-                      setState(() {
-                        showLoading = false;
-                      });
-                      return;
-                    }
+                    SizedBox(width: 20,),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)))),
+                      child: const Text('로그인하기',),
+                      onPressed: () async {
+                        setState(() {
+                          showLoading = true;
+                        });
 
-                    // Firebase에 이메일과 비밀번호로 로그인
-                    await signInWithEmailAndPassword(email, password);
-                  },
+                        String userId = userIdController.text.trim();
+                        String userPw = userPwController.text.trim();
+
+                        if (userId.isEmpty || userPw.isEmpty) {
+                          Fluttertoast.showToast(
+                            msg: "아이디와 비밀번호를 입력해 주세요.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            fontSize: 16.0,
+                          );
+                          setState(() {
+                            showLoading = false;
+                          });
+                          return;
+                        }
+                        // my SQL 로그인 
+
+                        await mySQL_login(userId,userPw);
+                        // Firebase에 이메일과 비밀번호로 로그인
+                        await signInWithEmailAndPassword(userId, userPw);
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -176,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: MediaQuery.of(context).size.width * 0.9,
                     height: 80,
                     color: Colors.white,
-                    child: Center(
+                    child: const Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -208,4 +261,10 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-}
+
+  //Function
+
+  mySQL_login(userId,UserPw) async{
+    print("user id : $userId");
+  }
+}//ENd
