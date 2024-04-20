@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Reco-Farm Application',
+      // global language settings
       localizationsDelegates: const [
         GlobalCupertinoLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -47,11 +48,37 @@ class MyApp extends StatelessWidget {
       ],
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        fontFamily: 'Dongle',
+        textTheme: const TextTheme(
+          labelLarge: TextStyle(
+            fontSize: 30
+          ),
+          bodyLarge: TextStyle(
+            fontSize: 30
+          ),
+          bodySmall: TextStyle(
+            fontSize: 30
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 30
+          ),
+        ),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: Color.fromARGB(255, 254, 188, 66)),
         useMaterial3: true,
       ),
+
       home: SplashScreen(),
+      getPages: [
+        GetPage(
+          name: '/home',
+          page: () => const Home(),
+          transition: Transition.circularReveal,
+          transitionDuration: const Duration(seconds :1)
+        ),
+      ],
+
+
     );
   }
 }// END
