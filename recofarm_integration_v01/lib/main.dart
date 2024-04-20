@@ -21,6 +21,7 @@ import 'view/home.dart';
 */
 
 void main() async {
+  //플러터 프레임 워크가 앱을 실행할 준비가 될때 까지 기다림 
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

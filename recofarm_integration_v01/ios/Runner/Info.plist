@@ -2,6 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+<!-- 
+	Added code by pdg 2024.04.20
+		- webview 사용자 프로토콜 권한 묻기 
+
+-->
+	<key>NSAppTransportSecurity</key> 
+	<dict> 
+		<key>NSAllowsLocalNetworking</key> 
+		<true/> 
+		<key>NSAllowsArbitraryLoadsInWebContent</key> 
+		<true/>
+	</dict>
+
+
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
