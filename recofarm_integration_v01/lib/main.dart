@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:new_recofarm_app/firebase_options.dart';
+import 'package:new_recofarm_app/view/splash_screen.dart';
 import 'view/home.dart';
 
 /*
@@ -14,6 +15,8 @@ import 'view/home.dart';
   *   2024.04.17 by pdg
   *     - main get x 사용할 수있도록 수정함 
   *     - debug mode flag 없앰
+      2024.04.20 by pdg
+        - splash screen 
   *
 */
 
@@ -47,7 +50,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Home(),
+      home: SplashScreen(),
     );
   }
 }// END

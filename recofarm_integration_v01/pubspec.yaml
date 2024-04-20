@@ -5,6 +5,8 @@ description: "A new Flutter project."
 ## Update
 #   2024.04.17 by pdg
   #     - GPS 허용 을 위한 GPS package 추가 
+#   2024.04.20 by pdg
+  #  yaml  주석  정리 
 
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -15,19 +17,12 @@ version: 1.0.0+1
 environment:
   sdk: '>=3.3.3 <4.0.0'
 
-# Dependencies specify other packages that your package needs in order to work.
-# To automatically upgrade your package dependencies to the latest versions
-# consider running `flutter pub upgrade --major-versions`. Alternatively,
-# dependencies can be manually updated by changing the version numbers below to
-# the latest version available on pub.dev. To see which dependencies have newer
-# versions available, run `flutter pub outdated`.
+## Flutter SDK 
 dependencies:
   flutter:
     sdk: flutter
 
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  ## Libraries 
   cupertino_icons: ^1.0.6
   provider: ^6.1.2
 
