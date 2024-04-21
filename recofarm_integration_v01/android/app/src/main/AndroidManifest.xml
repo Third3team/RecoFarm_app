@@ -2,7 +2,7 @@
 <uses-permission android:name="android.permission.ACCES_FINE_LOCATION" />
 <uses-permission android:name="android.permission.ACCES_COARSE_LOCATION" />
     <application
-        android:label="gps_map_app"
+        android:label="레코팜"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic ="true">
