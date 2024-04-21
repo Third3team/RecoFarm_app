@@ -57,24 +57,27 @@
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-
+	<!-- 카메라 이용 설정 image picker -->
 	<key>NSCameraUsageDescription</key>
 	<string>Used to demonstrate image picker plugin</string>
+
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Used to capture audio for image picker plugin</string>
+	<!-- 사진첩 이용 권한 -->
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Used to demonstrate image picker plugin</string>
-
-		<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs access to location when open.</string>
+	<!-- 사용자 GPS 이용 권한 -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>고객님의 위치 정보가 필요합니다.</string>
 
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app needs access to location when in the background.</string>
+	<string>고객님의 위치 정보가 필요합니다.</string>
 
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app needs access to location when open and in the background.</string>	
+	<string>고객님의 위치 정보가 필요합니다.</string>	
 
 </dict>
 </plist>
