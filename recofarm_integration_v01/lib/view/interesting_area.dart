@@ -3,10 +3,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-// import 'package:flutter_map/flutter_map.dart'; 
+// import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 /*
   Description : Google map 나의 관심 소재지 등록하기 페이지 
@@ -46,6 +47,8 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   // google map 컨트롤러!!
   late GoogleMapController mapController;
 
+  // markers
+  late List markers;
 
   @override
   void initState() {
@@ -62,12 +65,14 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     //print(interestLoc);
     // 경작지 위치  마커
     myloc1 = Marker(
-      markerId: MarkerId("경작지1"), 
+      markerId: const MarkerId("경작지1"),
       position: interestLoc,
-      infoWindow: InfoWindow(
-               title: "경작지1",
-               snippet: "배추밭",
-            ),);
+      infoWindow: const InfoWindow(
+        title: "내 경작지1",
+        snippet: "배추밭, 10000제곱 미터",
+      ),
+    );
+    markers = [myloc1];
     myAreaMeterSquare = 10000; // 100 m^2 -> 3.14 * r^2 =100 ->
     myAreaRadius = sqrt(myAreaMeterSquare / 3.14);
     // 경작지 반경
@@ -88,12 +93,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     searchedAddress = "";
     getPlaceAddress(interestLoc.latitude, interestLoc.longitude);
     //searchPlace();
-    
-    //map controller init
-   
-
-
-
+    //
   }
 
   @override
@@ -144,18 +144,16 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                 Expanded(
                   flex: 2,
                   child: GoogleMap(
-                    
-                    initialCameraPosition: CameraPosition(
-                      target: interestLoc,
-                      zoom: 16,
-                    ),
-                    myLocationButtonEnabled: true,
-                    markers: Set.from([myloc1]),
-                    circles: Set.from([myAreaCircle]),
+                      initialCameraPosition: CameraPosition(
+                        target: interestLoc,
+                        zoom: 14.4746,
+                      ),
+                      myLocationButtonEnabled: true,
+                      markers: Set.from(markers),
+                      circles: Set.from([myAreaCircle]),
 
-                    // controller setting
-                    onMapCreated: _onMapCreated
-                  ),
+                      // controller setting
+                      onMapCreated: _onMapCreated),
                 ),
                 Expanded(
                   child: Column(
@@ -205,9 +203,9 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
 
   // Function
 
-   void _onMapCreated(GoogleMapController controller) {
-      mapController = controller;
-   }
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
 
   searchPlace() async {
     String textsearchUrl =
@@ -220,12 +218,23 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     var dataCovertedJSON = json.decode(utf8.decode(responsePlace.bodyBytes));
     List address_result = dataCovertedJSON['results'];
     searchedAddress = address_result[0]['formatted_address'];
-    interestLoc =
-    LatLng(address_result[0]['geometry']['location']['lat'],
-    address_result[0]['geometry']['location']['lng']);
-    setState(() {
-      
-    });
+    interestLoc = LatLng(address_result[0]['geometry']['location']['lat'],
+        address_result[0]['geometry']['location']['lng']);
+    mapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: interestLoc,
+          zoom: 14.4746,
+        ),
+      ),
+    );
+    var findMarker = Marker(
+      markerId: MarkerId(searchedAddress),
+      position: interestLoc,
+    );
+
+    markers.add(findMarker);
+    setState(() {});
   }
 
   // 내가 입력한 주소의 위도경도를 아웃풋.
