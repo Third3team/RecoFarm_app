@@ -7,6 +7,8 @@ description: "A new Flutter project."
   #     - GPS 허용 을 위한 GPS package 추가 
 #   2024.04.20 by pdg
   #  yaml  주석  정리 
+#  2024.04.21 by  pdg
+  # - google map flutter 추가 
 
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -52,12 +54,13 @@ dependencies:
   ## SQLite
   sqflite: ^2.3.3
 
-  ##GPS
+  ##GPS and map packages
   geocoding: ^2.0.0
   geolocator: ^11.0.0
   flutter_map: ^6.1.0
   latlong2: ^0.9.1
   xml: ^6.5.0
+  google_maps_flutter: ^2.6.1
 
   ## Chart
   syncfusion_flutter_charts: ^25.1.40
@@ -91,6 +94,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - images/
+    - images/naver/
     # - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

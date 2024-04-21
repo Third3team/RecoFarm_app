@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
   * Updates     : 
   *   2024.04.20 by pdg
         - 기존 회원가입페이지 정상화 
-        - shared preference fh fhrmdls gka. 
+        - shared preference 로 아이디 패스워드 저장하여 mysql insert 에 넣기 . 
 
 */
 class RegisterPage extends StatefulWidget {
