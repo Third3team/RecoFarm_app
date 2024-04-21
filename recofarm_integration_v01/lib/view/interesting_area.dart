@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
@@ -13,6 +15,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
       - footter 디자인 + 내 관심 경작지로 이동하기 ( 우선 엘리베이트 버튼으로 구현 )
       - 내위치 권한 인증 및 내위치로 첫 지도 카메라 위치 이동 시키기 
       - 위치 권한이 없을 경우 앱을 사용하지 못하는 쪽으로 설계를 하자. 
+      - 특정 위치 마커 그리기 
   Detail      : - 
 
 */
@@ -28,6 +31,10 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   late TextEditingController locationTfController;
   late LatLng interestLoc;
   late bool islocationEnable;
+  late Marker myloc1 ;
+  late Circle myAreaCircle ;
+  late double myAreaMeterSquare;
+  late double myAreaRadius;
 
   @override
   void initState() {
@@ -36,6 +43,23 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     // 초기 관심 지역 위도 경도 설정
     interestLoc = const LatLng(37.5233273, 126.921252);
     //print(interestLoc);
+    // 경작지 위치  마커 
+    myloc1 = Marker(
+      markerId: MarkerId("경작지1"),
+      position: interestLoc
+    );
+    myAreaMeterSquare =10000; // 100 m^2 -> 3.14 * r^2 =100 -> 
+    myAreaRadius = sqrt(myAreaMeterSquare/3.14);
+    // 경작지 반경
+    myAreaCircle =Circle(
+      circleId: CircleId('myloc1'),
+      center: interestLoc,
+      fillColor: Colors.blue.withOpacity(0.4),
+      radius:myAreaRadius,
+      strokeColor: Colors.blue,
+      strokeWidth: 1,
+      );
+    
   }
 
   @override
@@ -54,11 +78,13 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
           preferredSize: Size.fromHeight(100),
           child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.7,
-            height: 50,
+            height: 100,
             child: TextField(
-              textAlign: TextAlign.center,
+              textAlign: TextAlign.start,
               decoration: InputDecoration(
-                  labelText: "농작할 소재지 주소를 입력해주세요.",
+                  // alignLabelWithHint: true,
+                  floatingLabelAlignment: FloatingLabelAlignment.start,
+                  labelText: "소재지 주소 검색",
                   labelStyle: TextStyle(color: Colors.green[300])),
               controller: locationTfController,
             ),
@@ -84,7 +110,12 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                   flex: 2,
                   child: GoogleMap(
                     initialCameraPosition:
-                        CameraPosition(target: interestLoc, zoom: 16),
+                        CameraPosition(
+                          target: interestLoc,
+                         zoom: 16,
+                         ),
+                         markers: Set.from([myloc1]),
+                         circles: Set.from([myAreaCircle]),
                   ),
                 ),
                 Expanded(
@@ -102,7 +133,13 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                 ),
               ],
             );
-          }
+          } // If end
+          // 권한 설정이 안되어있을 때
+          return Center(
+            child: Text(
+              snapshot.data.toString(),
+            ),
+          );
         },
       ),
     );
@@ -113,7 +150,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     final checkedPermission = await Geolocator.checkPermission();
   }
 
-  // 내위치  파악 및 권한 설정
+  // 내위치  파악 및 권한 설정 함수
   Future<String> checkPermission() async {
     islocationEnable = await Geolocator.isLocationServiceEnabled();
 
