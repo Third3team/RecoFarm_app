@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+// import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 /*
   Description : Google map 나의 관심 소재지 등록하기 페이지 
@@ -16,6 +20,13 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
       - 내위치 권한 인증 및 내위치로 첫 지도 카메라 위치 이동 시키기 
       - 위치 권한이 없을 경우 앱을 사용하지 못하는 쪽으로 설계를 하자. 
       - 특정 위치 마커 그리기 
+      - 특정 위치 를 기준으로 나의 경작지 면적 을 반경으로 지도위에 표시 하기 
+      - geo coding package 를 활용하여 주소 검색 을 해보자. 
+        -> json 형태로 주소를 받아오기때문에 http 가 필요함. 
+      - 소재지 주소 검색하여 경작지 위치로 이동하는것 완료
+      - 소재지에서 관심 작물을 키울때 예측 생산량 보여주는 버튼을 만들어야함. 
+      - 지도에서 클릭 했을때 마커 위치 변경하고 해당위치에서의 경작지 면적을 입력받아 반경그림 추가하고 위치경작정보를 누르면
+      - 페이지 이동
   Detail      : - 
 
 */
@@ -31,35 +42,62 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   late TextEditingController locationTfController;
   late LatLng interestLoc;
   late bool islocationEnable;
-  late Marker myloc1 ;
-  late Circle myAreaCircle ;
+  late Marker myloc1;
+  late Circle myAreaCircle;
   late double myAreaMeterSquare;
   late double myAreaRadius;
+  late double distance1;
+  late String searchedAddress;
+  // google map 컨트롤러!!
+  late GoogleMapController mapController;
+
+  // markers
+  late List markers;
 
   @override
   void initState() {
     super.initState();
-    locationTfController = TextEditingController();
+    locationTfController = TextEditingController(text: "");
     // 초기 관심 지역 위도 경도 설정
-    interestLoc = const LatLng(37.5233273, 126.921252);
+    // 안동 풍천면
+    //안동시 임동면 마령리
+    //36.595086846, 128.9351767475763
+    //36.520066541588. 경도, 128.54648045198.
+    // interestLoc = const LatLng(37.5233273, 126.921252);
+    // interestLoc = const LatLng(36.520066541588, 128.54648045198);
+    interestLoc = const LatLng(36.595086846, 128.9351767475763);
     //print(interestLoc);
-    // 경작지 위치  마커 
+    // 경작지 위치  마커
     myloc1 = Marker(
-      markerId: MarkerId("경작지1"),
-      position: interestLoc
+      markerId: const MarkerId("경작지1"),
+      position: interestLoc,
+      infoWindow: const InfoWindow(
+        title: "내 경작지1",
+        snippet: "배추밭, 10000제곱 미터",
+      ),
     );
-    myAreaMeterSquare =10000; // 100 m^2 -> 3.14 * r^2 =100 -> 
-    myAreaRadius = sqrt(myAreaMeterSquare/3.14);
+    markers = [myloc1];
+    myAreaMeterSquare = 10000; // 100 m^2 -> 3.14 * r^2 =100 ->
+    myAreaRadius = sqrt(myAreaMeterSquare / 3.14);
     // 경작지 반경
-    myAreaCircle =Circle(
+    myAreaCircle = Circle(
       circleId: CircleId('myloc1'),
       center: interestLoc,
       fillColor: Colors.blue.withOpacity(0.4),
-      radius:myAreaRadius,
+      radius: myAreaRadius,
       strokeColor: Colors.blue,
       strokeWidth: 1,
-      );
-    
+    );
+
+    // 경작지1 과 현재 위치 간 거리 계산
+    distance1 = 0;
+    getPlaceAddress(interestLoc.latitude, interestLoc.longitude);
+
+    //
+    searchedAddress = "";
+    getPlaceAddress(interestLoc.latitude, interestLoc.longitude);
+    //searchPlace();
+    //
   }
 
   @override
@@ -71,6 +109,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
           IconButton(
               onPressed: () {
                 // 소재지 검색 함수
+                searchPlace();
               },
               icon: Icon(Icons.search_outlined))
         ],
@@ -109,25 +148,54 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                 Expanded(
                   flex: 2,
                   child: GoogleMap(
-                    initialCameraPosition:
-                        CameraPosition(
-                          target: interestLoc,
-                         zoom: 16,
-                         ),
-                         markers: Set.from([myloc1]),
-                         circles: Set.from([myAreaCircle]),
-                  ),
+                      initialCameraPosition: CameraPosition(
+                        target: interestLoc,
+                        zoom: 14.4746,
+                      ),
+                      myLocationButtonEnabled: true,
+                      markers: Set.from(markers),
+                      circles: Set.from([myAreaCircle]),
+
+                      // controller setting
+                      onMapCreated: _onMapCreated),
                 ),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("내 관심 경작지 리스트(combo box)"),
-                      ElevatedButton(
-                          onPressed: () {
-                            // google map 이동
-                          },
-                          child: const Text("경작지1"))
+                      //const Text("내 관심 경작지 리스트(combo box)"),
+                      Text(searchedAddress),
+                      Text("현위치에서 거리 : ${distance1.toStringAsFixed(2)} km"),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              // google map 이동
+                              ;
+                            },
+                            child: Text("위치경작정보"),
+                          ),
+                          SizedBox(
+                            width: 20,
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              // 관심농지 추가 하여 마커 색이 변한다. 
+                              ;
+                            },
+                            child: Text("관심농지추가"),
+                          ),
+                          SizedBox(width: 20,),
+                          ElevatedButton(
+                            onPressed: () {
+                              // 면적을 입력하는 액션시트가 뜨고 입력된값 만큼 지도 반경 표시 되며 그값으로 예측값 출력계산한다. 
+                              ;
+                            },
+                            child: Text("면적입력"),
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),
@@ -146,8 +214,70 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   }
 
   // Function
-  location_find() async {
-    final checkedPermission = await Geolocator.checkPermission();
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
+
+  searchPlace() async {
+    String textsearchUrl =
+        "https://maps.googleapis.com/maps/api/place/textsearch/json?query=";
+    String key = "AIzaSyDslR-okT6JXHWhMmrOXaNxXhA6C0LxJHo";
+    textsearchUrl += "${locationTfController.text}&language=ko&key=$key";
+    var findAddressUri = Uri.parse(textsearchUrl);
+    var responsePlace = await http.get(findAddressUri);
+    //print(responsePlace.body);
+    var dataCovertedJSON = json.decode(utf8.decode(responsePlace.bodyBytes));
+    List address_result = dataCovertedJSON['results'];
+    searchedAddress = address_result[0]['formatted_address'];
+    interestLoc = LatLng(address_result[0]['geometry']['location']['lat'],
+        address_result[0]['geometry']['location']['lng']);
+    mapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: interestLoc,
+          zoom: 14.4746,
+        ),
+      ),
+    );
+    var findMarker = Marker(
+      markerId: MarkerId(searchedAddress),
+      position: interestLoc,
+    );
+
+    markers.add(findMarker);
+    // 거리계산
+    curPos_to_myArea();
+
+    setState(() {});
+  }
+
+  // 내가 입력한 주소의 위도경도를 아웃풋.
+  getPlaceAddress(double lat, double lng) async {
+    //var findLatlngUri =Uri.parse("https:/maps.googleapis.com/maps/api/geocode/json?address=${locationTfController.text}&key=AIzaSyDslR-okT6JXHWhMmrOXaNxXhA6C0LxJHo");
+    var findAddressUri = Uri.parse(
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&language=ko&key=AIzaSyDslR-okT6JXHWhMmrOXaNxXhA6C0LxJHo');
+    //var responseFLU = await http.get(findLatlngUri);
+    var responseFAU = await http.get(findAddressUri);
+
+    //print(responseFAU.body);
+    var dataCovertedJSON = json.decode(utf8.decode(responseFAU.bodyBytes));
+    List address_result = dataCovertedJSON['results'];
+    searchedAddress = address_result[0]['formatted_address'];
+
+    // data.addAll(result);
+    setState(() {});
+  }
+
+  // 내 위치와 관심 경작지 위치의 거리를 계산해줌.
+  curPos_to_myArea() async {
+    // 현재 위치 파악
+    var curPosition = await Geolocator.getCurrentPosition();
+    // 내 관심경작지와의 거리 파악
+    distance1 = Geolocator.distanceBetween(curPosition.latitude,
+        curPosition.longitude, interestLoc.latitude, interestLoc.longitude)/1000.0;
+    setState(() {});
+    // return LatLng(curPosition.latitude, curPosition.longitude);
   }
 
   // 내위치  파악 및 권한 설정 함수
