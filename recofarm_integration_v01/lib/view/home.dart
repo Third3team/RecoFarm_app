@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:new_recofarm_app/view/find_my_password.dart';
 import 'package:new_recofarm_app/view/interesting_area.dart';
-import 'package:new_recofarm_app/view/login.dart';
+import 'package:new_recofarm_app/view/login_page.dart';
 import 'package:new_recofarm_app/view/login_page.dart';
 import 'package:new_recofarm_app/view/mainview.dart';
 import 'package:new_recofarm_app/view/register_page.dart';
@@ -21,6 +21,8 @@ import 'web_view_page.dart';
   Detail      : 
     -2024.04.20 by pdg
       회원가입 페이지 및 로그인 페이지 추가  
+    -2024.04.21 by pdg
+      내 관심 소재지 등록 페이지 추가 
 
 */
 
@@ -45,7 +47,7 @@ class Home extends StatelessWidget {
 
 
             ElevatedButton(
-              onPressed: () => Get.to(InterArea()), 
+              onPressed: () => Get.to(InterestingAreaPage()), 
               child: const Text("=> 나의 관심 농작지")),
 
             ElevatedButton(
@@ -63,7 +65,7 @@ class Home extends StatelessWidget {
             ElevatedButton(
                 onPressed: () {
                   // Login Page by pdg
-                  Get.to(LoginScreen(),
+                  Get.to(LoginPage(),
                     transition: Transition.circularReveal,
                     
                   );

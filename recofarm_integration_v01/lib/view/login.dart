@@ -12,6 +12,8 @@ import 'package:get/get.dart';
 	  2024.0420 Sat by pdg
 		  - 로그인 페이지  이메일이 아니라 아이디 비밀번호로 바꿈 
       - 테마 및 글자 크기 변경함. 
+      - firebase setting 모두 삭제 
+
   Detail      : - 
 
 */
@@ -21,6 +23,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  // userId, userPw  text field 
   TextEditingController userIdController = TextEditingController();
   TextEditingController userPwController = TextEditingController();
 
@@ -88,8 +91,8 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(20.0),
+          Container(
+            color: Theme.of(context).colorScheme.onInverseSurface,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -162,28 +165,29 @@ class _LoginScreenState extends State<LoginScreen> {
                     ElevatedButton(
                       onPressed: () {
                         // 회원 가입 페이지로 이동
-                        Get.toNamed(
-                          '/register'
-                          
-                        );
+                        Get.toNamed('/register');
                       },
                       style: ElevatedButton.styleFrom(
                           shape: const RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)))),
-                      child: const Text('회원가입하기',
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 78, 101, 121)
-                      ),),
+                      child: const Text(
+                        '회원가입하기',
+                        style:
+                            TextStyle(color: Color.fromARGB(255, 78, 101, 121)),
+                      ),
                     ),
-
-                    SizedBox(width: 20,),
+                    SizedBox(
+                      width: 10,
+                    ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           shape: const RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)))),
-                      child: const Text('로그인하기',),
+                      child: const Text(
+                        '로그인하기',
+                      ),
                       onPressed: () async {
                         setState(() {
                           showLoading = true;
@@ -205,15 +209,46 @@ class _LoginScreenState extends State<LoginScreen> {
                           });
                           return;
                         }
-                        // my SQL 로그인 
+                        // my SQL 로그인
 
-                        await mySQL_login(userId,userPw);
+                        await mySQL_login(userId, userPw);
                         // Firebase에 이메일과 비밀번호로 로그인
                         await signInWithEmailAndPassword(userId, userPw);
                       },
                     ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        // 비밀번호찾기 페이지로 이동
+                        Get.toNamed('/findPw');
+                      },
+                      style: ElevatedButton.styleFrom(
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)))),
+                      child: const Text(
+                        '비밀번호찾기',
+                        style:
+                            TextStyle(color: Color.fromARGB(255, 65, 154, 9)),
+                      ),
+                    ),
                   ],
                 ),
+                SizedBox(height: 30,),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    IconButton(
+                      onPressed: (){}, 
+                      icon:Image.asset("images/naver/btnW_.png",
+                    width: 100,), )
+
+                    
+                  ],
+                )
               ],
             ),
           ),
@@ -264,7 +299,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   //Function
 
-  mySQL_login(userId,UserPw) async{
+  mySQL_login(userId, UserPw) async {
     print("user id : $userId");
   }
-}//ENd
+} //ENd
