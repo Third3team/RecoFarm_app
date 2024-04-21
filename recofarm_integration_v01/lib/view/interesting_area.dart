@@ -23,6 +23,10 @@ import 'package:syncfusion_flutter_charts/charts.dart';
       - 특정 위치 를 기준으로 나의 경작지 면적 을 반경으로 지도위에 표시 하기 
       - geo coding package 를 활용하여 주소 검색 을 해보자. 
         -> json 형태로 주소를 받아오기때문에 http 가 필요함. 
+      - 소재지 주소 검색하여 경작지 위치로 이동하는것 완료
+      - 소재지에서 관심 작물을 키울때 예측 생산량 보여주는 버튼을 만들어야함. 
+      - 지도에서 클릭 했을때 마커 위치 변경하고 해당위치에서의 경작지 면적을 입력받아 반경그림 추가하고 위치경작정보를 누르면
+      - 페이지 이동
   Detail      : - 
 
 */
@@ -159,9 +163,9 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("내 관심 경작지 리스트(combo box)"),
-                      Text("거리 : ${distance1.toStringAsFixed(2)} m"),
+                      //const Text("내 관심 경작지 리스트(combo box)"),
                       Text(searchedAddress),
+                      Text("현위치에서 거리 : ${distance1.toStringAsFixed(2)} km"),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -170,17 +174,25 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                               // google map 이동
                               ;
                             },
-                            child: Text("경작지로 이동"),
+                            child: Text("위치경작정보"),
                           ),
                           SizedBox(
                             width: 20,
                           ),
                           ElevatedButton(
                             onPressed: () {
-                              // google map 이동
+                              // 관심농지 추가 하여 마커 색이 변한다. 
                               ;
                             },
                             child: Text("관심농지추가"),
+                          ),
+                          SizedBox(width: 20,),
+                          ElevatedButton(
+                            onPressed: () {
+                              // 면적을 입력하는 액션시트가 뜨고 입력된값 만큼 지도 반경 표시 되며 그값으로 예측값 출력계산한다. 
+                              ;
+                            },
+                            child: Text("면적입력"),
                           ),
                         ],
                       )
@@ -214,7 +226,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     textsearchUrl += "${locationTfController.text}&language=ko&key=$key";
     var findAddressUri = Uri.parse(textsearchUrl);
     var responsePlace = await http.get(findAddressUri);
-    print(responsePlace.body);
+    //print(responsePlace.body);
     var dataCovertedJSON = json.decode(utf8.decode(responsePlace.bodyBytes));
     List address_result = dataCovertedJSON['results'];
     searchedAddress = address_result[0]['formatted_address'];
@@ -234,6 +246,9 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     );
 
     markers.add(findMarker);
+    // 거리계산
+    curPos_to_myArea();
+
     setState(() {});
   }
 
@@ -255,14 +270,14 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   }
 
   // 내 위치와 관심 경작지 위치의 거리를 계산해줌.
-  Future<LatLng> curPos_to_myArea() async {
+  curPos_to_myArea() async {
     // 현재 위치 파악
-    final curPosition = await Geolocator.getCurrentPosition();
+    var curPosition = await Geolocator.getCurrentPosition();
     // 내 관심경작지와의 거리 파악
     distance1 = Geolocator.distanceBetween(curPosition.latitude,
-        curPosition.longitude, interestLoc.latitude, interestLoc.longitude);
+        curPosition.longitude, interestLoc.latitude, interestLoc.longitude)/1000.0;
     setState(() {});
-    return LatLng(curPosition.latitude, curPosition.longitude);
+    // return LatLng(curPosition.latitude, curPosition.longitude);
   }
 
   // 내위치  파악 및 권한 설정 함수
