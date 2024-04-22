@@ -2,8 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserFirebase {
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> selectUserEqaulPhone(String phone) {
-    return FirebaseFirestore.instance.collection('user').where('phone', isEqualTo: phone).snapshots();
+  Stream<QuerySnapshot<Map<String, dynamic>>> selectUserEqaulID(String userId) {
+    print('db userId Query : $userId');
+    return FirebaseFirestore.instance.collection('user').where('userId', isEqualTo: userId).snapshots();
   }
 
   Future<bool> alreadyCheckUserId(String userId) async {
@@ -33,9 +34,9 @@ class UserFirebase {
     // Firebase 확인
     await FirebaseFirestore.instance.collection('user')
     // userId 정보 확인
-    .where('userid', isEqualTo: userId)
+    .where('userId', isEqualTo: userId)
     // userPw 정보 확인
-    .where('password', isEqualTo: userPw)
+    .where('userPw', isEqualTo: userPw)
     // snapshots은 변경사항을 계속가져옴, 한번만 가져올 것이라면 get을 사용해도 무방함
     .get()
     .then((QuerySnapshot<Map<String, dynamic>> userInfo) {
@@ -53,13 +54,25 @@ class UserFirebase {
     return response;
   }
 
-  firebaseUserInsertAction(String userId, String userPw, String userName) async {
-    // final prefs = await SharedPreferences.getInstance();
+  firebaseUserInsertAction(String userId, String userPw, String userName, String userEmail, String userPhone, String userNickName) async {
+
+    // userId, 
+    // userPw, 
+    // userName, 
+    // userEmail, 
+    // userPhone, 
+    // userNickName
+
     await FirebaseFirestore.instance.collection('user').add(
       {
-        'name' : userName,
-        'userid' : userId,
-        'password' : userPw,
+        'userId' : userId,
+        'userPw' : userPw,
+        'userName' : userName,
+        'userEmail' : userEmail,
+        'userPhone' : userPhone,
+        'userNickName' : userNickName,
+        'create_date' : DateTime.now(),
+        'modify_date' : DateTime.now(),
       }
     );
   }
