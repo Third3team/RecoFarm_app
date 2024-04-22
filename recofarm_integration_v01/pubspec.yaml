@@ -29,6 +29,8 @@ dependencies:
   provider: ^6.1.2
   shared_preferences: ^2.2.3
 
+  ## sliderble
+  flutter_slidable: ^3.1.0
 
   ##Webview
   webview_flutter: ^4.7.0
