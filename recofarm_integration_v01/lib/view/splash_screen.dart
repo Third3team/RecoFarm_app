@@ -90,15 +90,13 @@ class _SplashScreenState extends State<SplashScreen> {
         top: true,
         bottom: true,
         //maintainBottomViewPadding: true,
-        
-      
         child: PageView(
           controller: pageController,
           children: [
             // 농부가 웃고있는 그림.(+ process indicator )
             Container(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 241, 178, 82),
+              decoration:  BoxDecoration(
+                color:Colors.amber[100],
               ),
               child: Center(
                 child: Container(
@@ -135,8 +133,8 @@ class _SplashScreenState extends State<SplashScreen> {
       
             Container(
               width: MediaQuery.of(context).size.width * 0.8,
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 241, 178, 82),
+              decoration:  BoxDecoration(
+                color: Colors.amber[100]
               ),
               child: Column(
                 children: [
