@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
+import 'package:new_recofarm_app/view/login_page.dart';
+import 'package:new_recofarm_app/vm/user_firebase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /*
@@ -26,6 +29,9 @@ class _RegisterPageState extends State<RegisterPage>
   late TextEditingController confirmPwController; // 비밀번호 재확인 필드 추가
   late TextEditingController userNameController;
 
+  late bool _isloading;
+  late bool _readOnly;
+
   @override
   void initState() {
     super.initState();
@@ -35,6 +41,9 @@ class _RegisterPageState extends State<RegisterPage>
     confirmPwController = TextEditingController(); // 비밀번호 재확인 필드 초기화
     userNameController = TextEditingController();
     initSharedPreferences();
+
+    _isloading = false;
+    _readOnly = false;
   }
 
   initSharedPreferences() async {
@@ -76,15 +85,44 @@ class _RegisterPageState extends State<RegisterPage>
       body: Center(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: TextField(
-                controller: userIdController,
-                decoration: InputDecoration(
-                  labelText: 'ID 를 입력하세요',
-                  border: OutlineInputBorder(),
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: SizedBox(
+                    width: 280,
+                    child: TextField(
+                      controller: userIdController,
+                      decoration: const InputDecoration(
+                        labelText: 'ID 를 입력하세요',
+                        border: OutlineInputBorder(),
+                      ),
+                      readOnly: _readOnly,
+                    ),
+                  ),
                 ),
-              ),
+                ElevatedButton(
+                  onPressed: _readOnly ? null : () async {
+                
+                    UserFirebase userDB = UserFirebase();
+                
+                    String userId = userIdController.text.trim();
+                    final checkId = await userDB.alreadyCheckUserId(userId);
+
+                    // ID가 중복되었을때, 
+                    if(checkId) {
+                      print('아이디 중복!! ----');
+                      messageDialog('중복된 ID 입니다!');
+                      return;
+                    }
+
+                    messageDialog('사용가능한 ID 입니다.');
+                    _readOnly = true;
+                    setState(() {});
+                  },
+                  child: const Text('중복확인'),
+                ),
+              ],
             ),
             Padding(
               padding: const EdgeInsets.all(20.0),
@@ -139,7 +177,7 @@ class _RegisterPageState extends State<RegisterPage>
                       const SnackBar(content: Text('비밀번호가 일치하지 않습니다.')),
                     );
                   } else {
-                    saveSharedPreferences();
+                    registerAction();
                     //관심 농작물 페이지로 이동
                     //Get.to(const InterestProduct());
                   }
@@ -153,10 +191,70 @@ class _RegisterPageState extends State<RegisterPage>
     );
   }
 
+  // login Action
+  registerAction() async {
+
+    _isloading = true;
+
+    UserFirebase userDB = UserFirebase();
+
+    final userId = userIdController.text;
+    final userPw = userPwController.text;
+    final userName = userNameController.text;
+
+    await userDB.firebaseUserInsertAction(userId, userPw, userName);
+
+    setState(() {
+      _isloading = false;
+    });
+
+    if(!_isloading) {
+      nextDialog();
+    }
+  }
+
   saveSharedPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('userId', userIdController.text);
     prefs.setString('userPw', userPwController.text);
-    prefs.setString('userName', userNameController.text);
   }
+
+  nextDialog() {
+    Get.defaultDialog(
+      title: '알림',
+      middleText: '회원가입 완료! 바로 로그인 하시겠습니까?',
+      actions: [
+        ElevatedButton(
+          onPressed: () {
+            Get.back();
+          },
+          child: const Text('취소')
+        ),
+        ElevatedButton(
+          onPressed: () {
+            // 바로 로그인 하게되면, 정보를 저장하고 다음 페이지에서 정보를 받아와서 로그인한다.
+            saveSharedPreferences();
+            // 넘길 page
+            Get.off(const LoginPage());
+          },
+          child: const Text('확인')
+        )
+      ]
+    );
+  }
+
+  messageDialog(String messageText) {
+    Get.defaultDialog(
+      title: '알림',
+      middleText: messageText,
+      actions: [
+        ElevatedButton(
+          onPressed: () => Get.back(),
+          child: const Text('확인')
+        )
+      ]
+    );
+  }
+
+
 }

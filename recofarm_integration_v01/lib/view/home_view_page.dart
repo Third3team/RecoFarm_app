@@ -41,10 +41,10 @@ class HomeViewPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Reco Farm'),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search)
-          )
+          // IconButton(
+          //   onPressed: () {},
+          //   icon: const Icon(Icons.search)
+          // )
         ],
       ),
       drawer: const DrawerWidget(),
@@ -77,14 +77,14 @@ class HomeViewPage extends StatelessWidget {
                                   Text(
                                     '${userModel.name}  ',
                                     style: const TextStyle(
-                                      fontSize: 25,
+                                      fontSize: 30,
                                       fontWeight: FontWeight.bold
                                     ),
                                   ),
                                   const Text(
                                     '님의 관심 작물',
                                     style: TextStyle(
-                                      fontSize: 20
+                                      fontSize: 25
                                     ),
                                   ),
                                 ],
@@ -96,7 +96,7 @@ class HomeViewPage extends StatelessWidget {
                               child: Swiper(
                                 itemBuilder: (BuildContext context,int index){
                                   return Container(
-                                    color: Colors.blue
+                                    color: Colors.blue,
                                   );
                                 },
                                 itemCount: 3,
@@ -128,7 +128,7 @@ class HomeViewPage extends StatelessWidget {
                                     '오늘의 배추가격은?',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 23
+                                      fontSize: 30
                                     ),
                                   ),
                                 ),
@@ -156,58 +156,58 @@ class HomeViewPage extends StatelessWidget {
                                             Column(
                                               children: [
                                                 Padding(
-                                                  padding: const EdgeInsets.fromLTRB(15, 10, 0, 7),
+                                                  padding: const EdgeInsets.fromLTRB(15, 10, 0, 0),
                                                   child: Row(
                                                     children: [
                                                       Text(
                                                         '${cabbageController.apiModel[index]['date']!.substring(0,4)} - ${cabbageController.apiModel[index]['date']!.substring(4,6)} - ${cabbageController.apiModel[index]['date']!.substring(6,8)}',
                                                         style: const TextStyle(
-                                                          fontSize: 18
+                                                          fontSize: 25
                                                         ),
                                                       ),
                                                     ],
                                                   ),
                                                 ),
-                                                Padding(
-                                                  padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    children: [
-                                                      const CircleAvatar(
-                                                        backgroundImage: AssetImage('images/Cabbage.png'),
-                                                        backgroundColor: Colors.white,
-                                                        radius: 40,
-                                                      ),
-                                                      const SizedBox(
-                                                        width: 50,
-                                                      ),
-                                                      Column(
-                                                        children: [
-                                                          Text(
-                                                            '${cabbageController.apiModel[index]['marketName']}',
-                                                            style: const TextStyle(
-                                                              fontSize: 17
-                                                            ),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    const CircleAvatar(
+                                                      backgroundImage: AssetImage('images/Cabbage.png'),
+                                                      backgroundColor: Colors.white,
+                                                      radius: 40,
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 50,
+                                                    ),
+                                                    Column(
+                                                      children: [
+                                                        Text(
+                                                          '${cabbageController.apiModel[index]['marketName']}',
+                                                          style: const TextStyle(
+                                                            fontSize: 20
                                                           ),
-                                                          Text(
-                                                            '${cabbageController.apiModel[index]['sClassName']}'
+                                                        ),
+                                                        Text(
+                                                          '${cabbageController.apiModel[index]['sClassName']}',
+                                                          style: const TextStyle(
+                                                            fontSize: 20
                                                           ),
-                                                          Text(
-                                                            '${cabbageController.apiModel[index]['weight']} 당 ',
-                                                            style: const TextStyle(
-                                                              fontSize: 17
-                                                            ),
+                                                        ),
+                                                        Text(
+                                                          '${cabbageController.apiModel[index]['weight']} 당 ',
+                                                          style: const TextStyle(
+                                                            fontSize: 24
                                                           ),
-                                                          Text(
-                                                            '평균 ${cabbageController.apiModel[index]['price']}원',
-                                                            style: const TextStyle(
-                                                              fontSize: 19
-                                                            ),
+                                                        ),
+                                                        Text(
+                                                          '평균 ${cabbageController.apiModel[index]['price']}원',
+                                                          style: const TextStyle(
+                                                            fontSize: 24
                                                           ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             )
@@ -221,10 +221,13 @@ class HomeViewPage extends StatelessWidget {
                                 Row(
                                   children: [
                                     const Text(
-                                      '출처 : 농림축산식품 공공데이터포털'
+                                      '출처 : 농림축산식품 공공데이터포털',
+                                      style: TextStyle(
+                                        fontSize: 20
+                                      ),
                                     ),
                                     const SizedBox(
-                                      width: 80,
+                                      width: 100,
                                     ),
                                     TextButton(
                                       onPressed: () => Get.to(const DetailCabbage()),
@@ -234,7 +237,7 @@ class HomeViewPage extends StatelessWidget {
                                       child: const Text(
                                         '자세히 보기',
                                         style: TextStyle(
-                                          fontSize: 20
+                                          fontSize: 30
                                         ),
                                       )
                                     ),
@@ -249,17 +252,17 @@ class HomeViewPage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 30, 0, 30),
                       child: Container(
-                        color: Color.fromARGB(255, 222, 216, 216),
+                        color: const Color.fromARGB(255, 222, 216, 216),
                         width: MediaQuery.of(context).size.width,
                         height: 5,
                       ),
                     ),
                     const Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                       child: Text(
                         '수확량 & 배추가격 예측',
                         style: TextStyle(
-                          fontSize: 23,
+                          fontSize: 30,
                           fontWeight: FontWeight.bold
                         ),
                       ),
@@ -278,7 +281,7 @@ class HomeViewPage extends StatelessWidget {
                               Text(
                                 '수확량 예측하기',
                                 style: TextStyle(
-                                  fontSize: 20
+                                  fontSize: 30
                                 ),
                               ),
                               SizedBox(width: 70),
@@ -304,7 +307,7 @@ class HomeViewPage extends StatelessWidget {
                                 Text(
                                   '배추가격 예측하기',
                                   style: TextStyle(
-                                    fontSize: 20
+                                    fontSize: 30
                                   ),
                                 ),
                                 SizedBox(width: 60),
