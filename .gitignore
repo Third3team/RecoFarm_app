@@ -24,3 +24,5 @@ TestResults.xml
 /Project/.DS_Store
 /Project/Data/.DS_Store
 /Project/Data/GAP/.DS_Store
+recofarm_integration_v01/build
+recofarm_integration_v01/.dart_tool

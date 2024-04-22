@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:new_recofarm_app/view/mainview.dart';
+import 'package:new_recofarm_app/vm/user_firebase.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /*
   Description : Login Page 
@@ -28,6 +31,12 @@ class _LoginPageState extends State<LoginPage> {
   // userId, userPw  text field 
   TextEditingController userIdController = TextEditingController();
   TextEditingController userPwController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    alreadyExistUserInfo();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -169,13 +178,15 @@ class _LoginPageState extends State<LoginPage> {
                           }
                           // my SQL 로그인
         
-                          await mySQL_login(userId, userPw);
+                          // await mySQL_login(userId, userPw);
                           // Firebase에 이메일과 비밀번호로 로그인
                           //await signInWithEmailAndPassword(userId, userPw);
+
+                          firebaseLoginAction(userId, userPw);
                         },
                       ),
                       SizedBox(
-                        width: 10,
+                        width: 10,     
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -218,5 +229,45 @@ class _LoginPageState extends State<LoginPage> {
 
   mySQL_login(userId, UserPw) async {
     print("user id : $userId");
+  }
+
+  alreadyExistUserInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    String userId = prefs.get('userId').toString();
+    String userPw = prefs.get('userPw').toString();
+
+    print('12: $userId');
+    print('12: $userPw');
+    if(userId.isNotEmpty) {
+      print(userId);
+      firebaseLoginAction(userId, userPw);
+    }
+  }
+
+  firebaseLoginAction(String userId, String userPw) async {
+    UserFirebase user = UserFirebase();
+    final response = await user.checkUser(userId, userPw);
+
+    if(response) {
+      print('로그인 완료!');
+
+      final prefs = await SharedPreferences.getInstance();
+      // sharedPreferences를 전부 초기화 시키고, 로그인 한 id만 남긴다.
+      prefs.clear();
+      prefs.setString('userId', userId);
+      
+      Get.offAll(MainView());
+    }
+    else {  
+      print('로그인 불가');
+      Fluttertoast.showToast(
+        msg: "아이디와 비밀번호를 확인해주세요.",
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        fontSize: 16.0,
+      );
+    }
   }
 } //ENd

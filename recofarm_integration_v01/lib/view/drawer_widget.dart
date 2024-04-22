@@ -4,13 +4,16 @@ import 'package:new_recofarm_app/vm/user_firebase.dart';
 
 class DrawerWidget extends StatelessWidget {
 
-  const DrawerWidget({super.key});
+  DrawerWidget({super.key, required this.userId});
+
+  final userId;
 
   @override
   Widget build(BuildContext context) {
+
     return Drawer(
       child: StreamBuilder<QuerySnapshot>(
-        stream: UserFirebase().selectUserEqaulPhone('01022842745'),
+        stream: UserFirebase().selectUserEqaulID(userId),
         builder: (context, snapshot) {
           if(!snapshot.hasData) {
             return const Center(child: Text('데이터가 없습니다.'),);
@@ -28,7 +31,7 @@ class DrawerWidget extends StatelessWidget {
                 accountName: Padding(
                   padding: const EdgeInsets.fromLTRB(6, 30, 0, 0),
                   child: Text(
-                    '${snapshot.data!.docs[0]['name']}님',
+                    '${snapshot.data!.docs[0]['userName']}님',
                     style: TextStyle(
                       fontSize: 20,
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
@@ -38,7 +41,7 @@ class DrawerWidget extends StatelessWidget {
                 accountEmail: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                   child: Text(
-                    '${snapshot.data!.docs[0]['nickname']}',
+                    '${snapshot.data!.docs[0]['userNickName']}',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                     ),

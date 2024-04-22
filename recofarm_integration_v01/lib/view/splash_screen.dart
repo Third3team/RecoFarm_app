@@ -43,12 +43,14 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     _progressValue = 0.0;
     void _updateProgress() {
-      setState(() {
-        _progressValue += 0.1;
-        if (_progressValue >= 1.0) {
-          _progressValue = 0.0;
-        }
-      });
+      if(mounted) {
+        setState(() {
+          _progressValue += 0.1;
+          if (_progressValue >= 1.0) {
+            _progressValue = 0.0;
+          }
+        });
+      }
     }
 
     _progressTimer = Timer.periodic(Duration(milliseconds: 200), (timer) {
@@ -66,9 +68,10 @@ class _SplashScreenState extends State<SplashScreen> {
       }
       if (nextpage == 1) {
         // splash 화면이 다되면 메인으로 넘어감.
-        Get.toNamed(
-          "/home",
-        );
+        // Get.toNamed(
+        //   "/home",
+        // );
+        Get.offNamed("/home");
         _timer.cancel();
       } else {
         nextpage++;
