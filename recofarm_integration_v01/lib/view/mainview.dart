@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:new_recofarm_app/view/home.dart';
 import 'package:new_recofarm_app/view/home_view_page.dart';
+import 'package:new_recofarm_app/view/interesting_area.dart';
+import 'package:new_recofarm_app/view/login_page.dart';
 
 /*
  
@@ -13,6 +15,9 @@ import 'package:new_recofarm_app/view/home_view_page.dart';
   Date        : 2024-04-17 13:32
   Author      : lcy
   Updates     : 
+    2024.04.22 by pdg 
+      - 탭바 왼쪽은 관심 농산품 가격확인 페이지로 ,오른쪽은 관심소재지(지도) 페이지로 나누는 작업
+
   Detail      : - 
 
 */
@@ -43,8 +48,8 @@ class _MainViewState extends State<MainView> with SingleTickerProviderStateMixin
       body: TabBarView(
         controller: tController,
         children: [
-          HomeViewPage(),
-          Home()
+          LoginPage(),
+          InterestingAreaPage()
         ]
       ),
       bottomNavigationBar: Container(
@@ -57,11 +62,11 @@ class _MainViewState extends State<MainView> with SingleTickerProviderStateMixin
           tabs: [
             Tab(
               icon: Icon(Icons.home),
-              text: 'ex home',
+              text: '관심농산품',
             ),
             Tab(
               icon: Icon(Icons.looks_two_outlined),
-              text: 'ex one',
+              text: '내 소재지',
             ),
             // Tab(
             //   icon: Icon(Icons.looks_two_outlined),
