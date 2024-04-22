@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 // import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -27,6 +28,12 @@ import 'package:syncfusion_flutter_charts/charts.dart';
       - 소재지에서 관심 작물을 키울때 예측 생산량 보여주는 버튼을 만들어야함. 
       - 지도에서 클릭 했을때 마커 위치 변경하고 해당위치에서의 경작지 면적을 입력받아 반경그림 추가하고 위치경작정보를 누르면
       - 페이지 이동
+
+      2024.04.22 by pdg
+        - 처음 페이지 가 현재 내 위치로 나오게 수정?
+        - 내 관심 농작지 List view 로 보여주는 기능 필요 ?
+        - 내 관심 농작지 페이지 list view 로 보여주는 페이지 를 제작 <- db 조회 필요..
+        - sql db 에서 가져와서 listview 로 플랏 해주고 
   Detail      : - 
 
 */
@@ -172,9 +179,10 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                           ElevatedButton(
                             onPressed: () {
                               // google map 이동
+                              Get.toNamed("/MyAreaList")
                               ;
                             },
-                            child: Text("위치경작정보"),
+                            child: Text("내경작지리스트"),
                           ),
                           SizedBox(
                             width: 20,

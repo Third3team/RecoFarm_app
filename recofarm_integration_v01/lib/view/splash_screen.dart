@@ -20,7 +20,8 @@ import 'home.dart';
 
         - 사용자가 로그인을 한번했으면 로그인페이지로 가지않고 메인페이지로 간다. 
         - 사용자가 로그인을 하지 않았거나 처음 사용한다면 로그인 페이지로 간다. 
-        
+      2024.04.22 By pdg 
+        - 스플레시 끝나고 메인들어갈때 뒤에 남지 않게  할 것 . 
 
 */
 
@@ -92,15 +93,13 @@ class _SplashScreenState extends State<SplashScreen> {
         top: true,
         bottom: true,
         //maintainBottomViewPadding: true,
-        
-      
         child: PageView(
           controller: pageController,
           children: [
             // 농부가 웃고있는 그림.(+ process indicator )
             Container(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 241, 178, 82),
+              decoration:  BoxDecoration(
+                color:Colors.amber[100],
               ),
               child: Center(
                 child: Container(
@@ -137,8 +136,8 @@ class _SplashScreenState extends State<SplashScreen> {
       
             Container(
               width: MediaQuery.of(context).size.width * 0.8,
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 241, 178, 82),
+              decoration:  BoxDecoration(
+                color: Colors.amber[100]
               ),
               child: Column(
                 children: [
