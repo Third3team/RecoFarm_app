@@ -53,10 +53,10 @@ class _MainViewState extends State<MainView> with SingleTickerProviderStateMixin
         ]
       ),
       bottomNavigationBar: Container(
-        color: Colors.amber,
+        color: Colors.amber[100],
         child: TabBar(
           controller: tController,
-          labelColor: Colors.green,
+          labelColor: Colors.green[700],
           indicatorColor: Colors.red,
           indicatorWeight: 4,
           tabs: [
@@ -65,8 +65,9 @@ class _MainViewState extends State<MainView> with SingleTickerProviderStateMixin
               text: '관심농산품',
             ),
             Tab(
-              icon: Icon(Icons.looks_two_outlined),
-              text: '내 소재지',
+              icon: Icon(Icons.checklist_rounded),
+              text: '내 경작지',
+            
             ),
             // Tab(
             //   icon: Icon(Icons.looks_two_outlined),
