@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 // import 'package:flutter_map/flutter_map.dart';
@@ -8,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:new_recofarm_app/view/my_area_list.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 /*
@@ -61,17 +63,12 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   // markers
   late List markers;
 
+  // myarea
+  late List myareaData;
   @override
   void initState() {
     super.initState();
     locationTfController = TextEditingController(text: "");
-    // 초기 관심 지역 위도 경도 설정
-    // 안동 풍천면
-    //안동시 임동면 마령리
-    //36.595086846, 128.9351767475763
-    //36.520066541588. 경도, 128.54648045198.
-    // interestLoc = const LatLng(37.5233273, 126.921252);
-    // interestLoc = const LatLng(36.520066541588, 128.54648045198);
     interestLoc = const LatLng(36.595086846, 128.9351767475763);
     //print(interestLoc);
     // 경작지 위치  마커
@@ -105,7 +102,22 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     getPlaceAddress(interestLoc.latitude, interestLoc.longitude);
     //searchPlace();
     //
+    myareaData = [];
+    get_myarea_JSONData("pulpilisory");
   }
+
+
+  get_myarea_JSONData(userId) async {
+      //String userId ;
+      String url_address ="http://localhost:8080/myarea?userId=$userId";
+      var url =Uri.parse(url_address); 
+      var response = await http.get(url);
+      print(response.body);
+      var dataConvertedJSON = json.decode(utf8.decode(response.bodyBytes));
+      List result = dataConvertedJSON;
+      myareaData.addAll(result);
+      setState(() {});
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -179,10 +191,12 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                           ElevatedButton(
                             onPressed: () {
                               // google map 이동
-                              Get.toNamed("/MyAreaList")
-                              ;
+                              
+                              // Get.toNamed("/MyAreaList");
+                              _showMyAreaActionSheet();
                             },
                             child: Text("내경작지리스트"),
+                            
                           ),
                           SizedBox(
                             width: 20,
@@ -190,17 +204,9 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                           ElevatedButton(
                             onPressed: () {
                               // 관심농지 추가 하여 마커 색이 변한다. 
-                              ;
+                              _addMyAreaActionSheet();
                             },
                             child: Text("관심농지추가"),
-                          ),
-                          SizedBox(width: 20,),
-                          ElevatedButton(
-                            onPressed: () {
-                              // 면적을 입력하는 액션시트가 뜨고 입력된값 만큼 지도 반경 표시 되며 그값으로 예측값 출력계산한다. 
-                              ;
-                            },
-                            child: Text("면적입력"),
                           ),
                         ],
                       )
@@ -222,7 +228,83 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   }
 
   // Function
+  // 2024.04.22 추가한 함수 
+  _showMyAreaActionSheet(){
+    showCupertinoModalPopup(
+      semanticsDismissible: true,
+      context: context, 
+      builder: (context) {
+        return GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: CupertinoActionSheet(
+            title: const Text("내경작지 리스트"),
+            actions: 
+              List.generate(
+                myareaData.length, (index) => 
+                CupertinoActionSheetAction(
+                  onPressed: (){
+                    print("clicked");
+                  },
+                  child:Text('''${index+1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})'''
+                  ,
+                    style: TextStyle(
+                      fontSize: 20
+                    ),
+                  ) ,
+                )
+                
+                )
+              
+            ,
+          )
+        );
 
+        //MyAreaList();
+        
+        },
+      barrierDismissible: true,
+      
+      
+      
+      );
+
+  }
+
+  _addMyAreaActionSheet() {
+    showCupertinoModalPopup(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => SizedBox(
+        height: 500,
+        child: CupertinoActionSheet(
+          
+          
+          title: const Text("관심농지 추가 "),
+          message: const Text("관심농지로 추가하시겠습니까?"),
+          actions: [
+            CupertinoActionSheetAction(
+                onPressed: () {
+                  print('action is pressed');
+                  //면적 입력 받기, 검색한 장소의 위도 경도 , 소재지 이름  넘길 것. 
+                  },
+                child: const Text("예")),
+            CupertinoActionSheetAction(
+                onPressed: () {
+                  print('action is pressed');
+                  Get.back();
+                },
+                child: const Text("아니오")),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: () => Get.back(),
+            child: const Text("Exit"),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 2024.04.21 추가한 함수들 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }

@@ -48,7 +48,7 @@ class _MainViewState extends State<MainView> with SingleTickerProviderStateMixin
       body: TabBarView(
         controller: tController,
         children: [
-          LoginPage(),
+          HomeViewPage(),
           InterestingAreaPage()
         ]
       ),
