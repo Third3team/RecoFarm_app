@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:new_recofarm_app/vm/vmpredict_yield.dart';
+import 'package:http/http.dart' as http;
 
 class PredictYield extends StatelessWidget {
   PredictYield({super.key});
@@ -229,16 +232,32 @@ class PredictYield extends StatelessWidget {
   }
 
   // function
-  predictAction() {
-    double area = 0;
-    area = double.parse(areaController.text);
+  predictAction() async {
+    double areaSize = 0;
+    areaSize = double.parse(areaController.text);
 
     if(!vmPredictController.unitGroupValue!) {
-      area = area * 3.3;
+      areaSize = areaSize * 3.3;
     }
 
-    var url = Uri.parse('http://localhost:8080/Flutter/Rserve/-----?면적=${area}&위도=${vmPredictController.latData}&경도=${vmPredictController.lngData}');
-    print(url);
+    var url = Uri.parse('http://localhost:8080/Flutter/Project_Rserve/predict.jsp?areaSize=${areaSize}&lat=${vmPredictController.latData}&lng=${vmPredictController.lngData}');
+    var response = await http.readBytes(url);
+    double result = json.decode(utf8.decode(response))['result'];
+
+    Get.defaultDialog(
+      title: '결과',
+      middleText: '예상 수확량은 ${result.toStringAsFixed(2)}톤 입니다.\n',
+      actions: [
+        ElevatedButton(
+          onPressed: () => Get.back(),
+          child: const Text('확인')
+        )
+      ]
+    );
+
+    print(result.toString());
+    // students.addAll(result);
+    // setState(() {});
   }
 
   errorSnackBar(context, String text) {

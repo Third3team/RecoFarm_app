@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:new_recofarm_app/view/home.dart';
 import 'package:new_recofarm_app/view/home_view_page.dart';
 import 'package:new_recofarm_app/view/interesting_area.dart';
 import 'package:new_recofarm_app/view/login_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /*
  
@@ -42,14 +42,16 @@ class _MainViewState extends State<MainView> with SingleTickerProviderStateMixin
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: TabBarView(
         controller: tController,
         children: [
+          HomeViewPage(),
           LoginPage(),
-          InterestingAreaPage()
+          // InterestingAreaPage(),
         ]
       ),
       bottomNavigationBar: Container(
