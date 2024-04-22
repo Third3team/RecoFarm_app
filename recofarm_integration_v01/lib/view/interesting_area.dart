@@ -107,22 +107,13 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   }
 
 
-  get_myarea_JSONData(userId) async {
-      //String userId ;
-      String url_address ="http://localhost:8080/myarea?userId=$userId";
-      var url =Uri.parse(url_address); 
-      var response = await http.get(url);
-      print(response.body);
-      var dataConvertedJSON = json.decode(utf8.decode(response.bodyBytes));
-      List result = dataConvertedJSON;
-      myareaData.addAll(result);
-      setState(() {});
-    }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 60,
         backgroundColor: Colors.amber[100],
         actions: [
           IconButton(
@@ -136,14 +127,29 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
           preferredSize: Size.fromHeight(100),
           child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.7,
-            height: 100,
+            height: 60,
             child: TextField(
               textAlign: TextAlign.start,
-              decoration: InputDecoration(
-                  // alignLabelWithHint: true,
-                  floatingLabelAlignment: FloatingLabelAlignment.start,
-                  labelText: "소재지 주소 검색",
-                  labelStyle: TextStyle(color: Colors.green[300])),
+              decoration: const InputDecoration(
+                // alignLabelWithHint: true,
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 223, 117, 110)
+                  )
+                ),
+                focusColor: Color.fromARGB(255, 239, 214, 214),
+
+                floatingLabelAlignment: FloatingLabelAlignment.start,
+                labelText: " 소재지 주소 검색",
+                labelStyle: TextStyle(
+                  color: Color.fromARGB(255, 235, 150, 31),
+                  shadows: CupertinoContextMenu.kEndBoxShadow,
+                  letterSpacing: 4,
+                  
+                 
+                  //textBaseline: TextBaseline.ideographic
+                ),
+              ),
               controller: locationTfController,
             ),
           ),
@@ -191,22 +197,21 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                           ElevatedButton(
                             onPressed: () {
                               // google map 이동
-                              
+
                               // Get.toNamed("/MyAreaList");
                               _showMyAreaActionSheet();
                             },
-                            child: Text("내경작지리스트"),
-                            
+                            child: Text("내 경작지 보기"),
                           ),
                           SizedBox(
                             width: 20,
                           ),
                           ElevatedButton(
                             onPressed: () {
-                              // 관심농지 추가 하여 마커 색이 변한다. 
+                              // 관심농지 추가 하여 마커 색이 변한다.
                               _addMyAreaActionSheet();
                             },
-                            child: Text("관심농지추가"),
+                            child: Text("관심농지로 추가"),
                           ),
                         ],
                       )
@@ -228,83 +233,64 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   }
 
   // Function
-  // 2024.04.22 추가한 함수 
-  _showMyAreaActionSheet(){
-    showCupertinoModalPopup(
-      semanticsDismissible: true,
-      context: context, 
-      builder: (context) {
-        return GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: CupertinoActionSheet(
-            title: const Text("내경작지 리스트"),
-            actions: 
-              List.generate(
-                myareaData.length, (index) => 
-                CupertinoActionSheetAction(
-                  onPressed: (){
-                    print("clicked");
-                  },
-                  child:Text('''${index+1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})'''
-                  ,
-                    style: TextStyle(
-                      fontSize: 20
-                    ),
-                  ) ,
-                )
-                
-                )
-              
-            ,
-          )
-        );
+  // 2024.04.22 추가한 함수
 
-        //MyAreaList();
-        
-        },
-      barrierDismissible: true,
-      
-      
-      
-      );
+  // 관심 농지 추가 버튼 클릭후 예 눌렀을 때 insert api
 
+  // 내 소재지 정보 불러오는 함수 .
+  get_myarea_JSONData(userId) async {
+    //String userId ;
+    String url_address = "http://localhost:8080/myarea?userId=$userId";
+    var url = Uri.parse(url_address);
+    var response = await http.get(url);
+    print(response.body);
+    var dataConvertedJSON = json.decode(utf8.decode(response.bodyBytes));
+    List result = dataConvertedJSON;
+    myareaData.addAll(result);
+    setState(() {});
   }
 
-  _addMyAreaActionSheet() {
+  _showMyAreaActionSheet() {
     showCupertinoModalPopup(
+      semanticsDismissible: true,
       context: context,
-      barrierDismissible: false,
-      builder: (context) => SizedBox(
-        height: 500,
-        child: CupertinoActionSheet(
-          
-          
-          title: const Text("관심농지 추가 "),
-          message: const Text("관심농지로 추가하시겠습니까?"),
-          actions: [
-            CupertinoActionSheetAction(
-                onPressed: () {
-                  print('action is pressed');
-                  //면적 입력 받기, 검색한 장소의 위도 경도 , 소재지 이름  넘길 것. 
-                  },
-                child: const Text("예")),
-            CupertinoActionSheetAction(
-                onPressed: () {
-                  print('action is pressed');
-                  Get.back();
-                },
-                child: const Text("아니오")),
-          ],
-          cancelButton: CupertinoActionSheetAction(
-            onPressed: () => Get.back(),
-            child: const Text("Exit"),
-          ),
-        ),
-      ),
+      builder: (context) {
+        return GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: CupertinoActionSheet(
+              title: const Text("내경작지 리스트"),
+              actions: List.generate(
+                  myareaData.length,
+                  (index) => CupertinoActionSheetAction(
+                        onPressed: () {
+                          print("clicked");
+                        },
+                        child: Text(
+                          '''${index + 1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})''',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      )),
+            ));
+
+        //MyAreaList();
+      },
+      barrierDismissible: true,
     );
   }
 
-  // 2024.04.21 추가한 함수들 
+  _addMyAreaActionSheet() {
+    Get.defaultDialog(
+      barrierDismissible: true,
+      title: "관심소재지 등록",
+      middleText: " 해당 위치를 관심 소재지로 등록하시겠습니까?",
+      actions: [
+        ElevatedButton(onPressed: () {}, child: Text("예")),
+        ElevatedButton(onPressed: () => Get.back(), child: Text("아니오")),
+      ],
+    );
+  }
+
+  // 2024.04.21 추가한 함수들
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
@@ -364,8 +350,12 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     // 현재 위치 파악
     var curPosition = await Geolocator.getCurrentPosition();
     // 내 관심경작지와의 거리 파악
-    distance1 = Geolocator.distanceBetween(curPosition.latitude,
-        curPosition.longitude, interestLoc.latitude, interestLoc.longitude)/1000.0;
+    distance1 = Geolocator.distanceBetween(
+            curPosition.latitude,
+            curPosition.longitude,
+            interestLoc.latitude,
+            interestLoc.longitude) /
+        1000.0;
     setState(() {});
     // return LatLng(curPosition.latitude, curPosition.longitude);
   }
