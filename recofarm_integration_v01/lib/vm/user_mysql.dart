@@ -8,9 +8,8 @@ class UserMySQL {
   List<UserArea> areaList = [];
 
 
-  getAreaData(String userId) async {
+  Future<List<UserArea>> getAreaData(String userId) async {
     // Forrest IP : 192.168.50.69
-    // url 아직 제대로 쓰지 않음
     var url = Uri.parse('http://192.168.50.69:8080/myarea?userId=$userId');
     var response = await http.readBytes(url);
     var result = json.decode(utf8.decode(response));
@@ -29,9 +28,10 @@ class UserMySQL {
       areaList.add(userArea);
     }
 
-    print(areaList.length);
+    // print(areaList.length);
 
     return areaList;
+
   }
 
 

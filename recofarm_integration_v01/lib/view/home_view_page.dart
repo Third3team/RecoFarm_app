@@ -1,6 +1,7 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:new_recofarm_app/model/user_area.dart';
 import 'package:new_recofarm_app/model/user_model.dart';
@@ -38,6 +39,9 @@ class HomeViewPage extends StatelessWidget {
     final NapaCabbageAPI cabbageController = Get.put(NapaCabbageAPI());
     cabbageController.fetchXmlData();
 
+    final Future<List<UserArea>> areaList = UserMySQL().getAreaData('lcy');
+    // final areaList = UserMySQL().areaList;
+
     return FutureBuilder(
       future: initSharedPreferences(),
       builder: (context, snapshot) {
@@ -52,13 +56,6 @@ class HomeViewPage extends StatelessWidget {
                   stream: UserFirebase().selectUserEqaulID(userId),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      // final UserModel userModel = UserModel(
-                      //   name: snapshot.data!.docs[0]['userName'],
-                      //   phone: snapshot.data!.docs[0]['phone'],
-                      //   nickName: snapshot.data!.docs[0]['nickname'],
-                      //   userImagePath: snapshot.data!.docs[0]['image']
-                      // );
-                      // 불러온 데이터가 있을 때,
                       return Center(
                         child: Column(
                           children: [
@@ -82,7 +79,7 @@ class HomeViewPage extends StatelessWidget {
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           const Text(
-                                            '님의 관심 작물',
+                                            '님의 관심 농작지',
                                             style: TextStyle(fontSize: 25),
                                           ),
                                         ],
@@ -90,18 +87,116 @@ class HomeViewPage extends StatelessWidget {
                                     ),
                                     SizedBox(
                                       width: 300,
-                                      height: 310,
-                                      child: Swiper(
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          return Container(
-                                            color: Colors.blue,
-                                          );
+                                      height: 300,
+                                      child: FutureBuilder(
+                                        future: areaList,
+                                        builder: (context, snapshot) {
+                                          if(snapshot.hasData) {
+                                            List<UserArea> areas = snapshot.data!;
+                                            return Swiper(
+                                              itemBuilder: (context, index) {
+                                                // Swiper 배경색
+                                                Color? backgroundColor;
+                                                backgroundColor = index % 2 == 0 ? 
+                                                Theme.of(context).colorScheme.secondaryContainer : 
+                                                Theme.of(context).colorScheme.errorContainer;
+                                                return Container(
+                                                  color: backgroundColor,
+                                                  child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Stack(
+                                                        children: [
+                                                          SizedBox(
+                                                            width: 300,
+                                                            height: 80,
+                                                            child: Text(
+                                                              areas[index].area_address,
+                                                              style: const TextStyle(
+                                                                fontSize: 45,
+                                                              ),
+                                                              textAlign: TextAlign.center,
+                                                            ),
+                                                          ),
+                                                          const Positioned(
+                                                            left: 190,
+                                                            top: -5,
+                                                            child: Text(
+                                                              '* 농작지 이름',
+                                                              style: TextStyle(
+                                                                fontSize: 20,
+                                                                color: Colors.red
+                                                              ),
+                                                            )
+                                                          )
+                                                        ],
+                                                      ),
+                                                      Stack(
+                                                        children: [
+                                                          SizedBox(
+                                                            width: 300,
+                                                            height: 80,
+                                                            child: Text(
+                                                              '${areas[index].area_size}',
+                                                              style: const TextStyle(
+                                                                fontSize: 45,
+                                                              ),
+                                                              textAlign: TextAlign.center,
+                                                            ),
+                                                          ),
+                                                          const Positioned(
+                                                            left: 190,
+                                                            top: -5,
+                                                            child: Text(
+                                                              '* 농작지 면적',
+                                                              style: TextStyle(
+                                                                fontSize: 20,
+                                                                color: Colors.red
+                                                              ),
+                                                            )
+                                                          )
+                                                        ],
+                                                      ),
+                                                      Stack(
+                                                        children: [
+                                                          SizedBox(
+                                                            width: 300,
+                                                            height: 80,
+                                                            child: Text(
+                                                              areas[index].area_product,
+                                                              style: const TextStyle(
+                                                                fontSize: 45,
+                                                              ),
+                                                              textAlign: TextAlign.center,
+                                                            ),
+                                                          ),
+                                                          const Positioned(
+                                                            left: 190,
+                                                            top: -5,
+                                                            child: Text(
+                                                              '* 농작지 작물',
+                                                              style: TextStyle(
+                                                                fontSize: 20,
+                                                                color: Colors.red
+                                                              ),
+                                                            )
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              },
+                                              itemCount: areas.length,
+                                              pagination: const SwiperPagination(),
+                                              );
+                                          }
+                                          else {
+                                            return const Text('데이터 없음');
+                                          }
                                         },
-                                        itemCount: 3,
-                                        pagination: const SwiperPagination(),
                                       ),
-                                    ),
+                                    )
                                   ],
                                 ),
                               ),
