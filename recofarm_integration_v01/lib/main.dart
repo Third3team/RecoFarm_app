@@ -32,6 +32,7 @@ void main() async {
 
   // Fire base init
   await Firebase.initializeApp(
+
     options: DefaultFirebaseOptions.currentPlatform,
   );
   // SharedPreferences preferences = await SharedPreferences.getInstance();
