@@ -53,8 +53,10 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   // properties
   late TextEditingController locationTfController;
   // Geometric properties
+  late LatLng? curLoc; 
   late LatLng interestLoc;
   late bool islocationEnable;
+
   late Marker myloc1;
   late Circle myAreaCircle;
   late double myAreaMeterSquare;
@@ -68,16 +70,23 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   // myarea
   late List myareaData;
 
-  // update 2024.04.23 below
+  // -----------------update 2024.04.23 below-----------------
   // shared pref instance init
   late SharedPreferences prefs; 
   // User info
   late String userId;
+  // my area product 
+  late String myareaProduct;
+  // my area Address(formmatted)
+  late String myareaAddress;
 
   // Init STATE-------------------------------
   @override
   void initState() {
     super.initState();
+    curLoc =null;
+    userId ="";
+    myareaProduct ="";
     locationTfController = TextEditingController(text: "");
     interestLoc = const LatLng(36.595086846, 128.9351767475763);
     //print(interestLoc);
@@ -119,11 +128,16 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     // user Id fetching and myarea access
     _getUserIdFromSharedPref();
     _getMyareaJSONData();
+
+    // 현재 지정된 위치(위도 경도)를 my sql Insert 
+    _curPosGenCalcDistance();
+    //print(" 현재위치의 위도 경도는 ${curLoc!.latitude}, ${curLoc!.latitude} 입니다 ");
+
   }
 
 
 
-
+////////////////////// [Screen build] ////////////////////
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -153,15 +167,12 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                   )
                 ),
                 focusColor: Color.fromARGB(255, 239, 214, 214),
-
                 floatingLabelAlignment: FloatingLabelAlignment.start,
                 labelText: " 소재지 주소 검색",
                 labelStyle: TextStyle(
                   color: Color.fromARGB(255, 235, 150, 31),
                   shadows: CupertinoContextMenu.kEndBoxShadow,
                   letterSpacing: 4,
-                  
-                 
                   //textBaseline: TextBaseline.ideographic
                 ),
               ),
@@ -183,16 +194,20 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
             );
           }
           if (snapshot.data == "위치 권한이 허가 되었습니다.") {
+      ///----------------------------------<< Screen 화면 >>------------------------------------------
             return Column(
               children: [
+                // Google map view 
                 Expanded(
-                  flex: 2,
+                  flex: 2, // 화면 2분할 
                   child: GoogleMap(
                       initialCameraPosition: CameraPosition(
-                        target: interestLoc,
+                        // 최초 맵 시작지점 <- 내현재위치 . 
+                        target: curLoc!,
                         zoom: 14.4746,
                       ),
                       myLocationButtonEnabled: true,
+                      // 마커와 내 반경 설정 
                       markers: Set.from(markers),
                       circles: Set.from([myAreaCircle]),
 
@@ -212,7 +227,6 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                           ElevatedButton(
                             onPressed: () {
                               // google map 이동
-
                               // Get.toNamed("/MyAreaList");
                               _showMyAreaActionSheet();
                             },
@@ -249,11 +263,34 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
 
   // Function
   // 2024.04.23 updated 
+  
+  _insertMyArea(curLat,curLng) async{
+    // Desc : 내관심 소재지 mySQL DB 에서 정보 가져오는 함수 
+    // Update : 2024.04.22 by pdg
+    //  - 더조은 학원 IP address  :  192.168.50.69   
+    //
+    //userId=pulpilisory&area_lat=37.108436612&area_lng=127.22501390&area_size=1200&area_product=배추&area_address=안성시 양선면 난실리 
+    String databaseIP  = "192.168.50.69";
+    String urlAreaInfo = "&area_lat=$curLat&area_lng=$curLng&area_size=$myAreaMeterSquare&area_product=$myareaProduct&area_address=$myareaAddress";
+    String urlAddress ="http://$databaseIP:8080/myareaInsert?userId=$userId";
+    urlAddress += urlAreaInfo;
+    print(urlAddress);
+    var url = Uri.parse(urlAddress);
+    var response = await http.get(url);
+    //print(response.body);
+    //var dataConvertedJSON = json.decode(utf8.decode(response.bodyBytes));
+    //List result = dataConvertedJSON;
+    //myareaData.addAll(result);
+    setState(() {});
+  
+  }
+
   _getUserIdFromSharedPref() async{
     // Desc : user Id 를 받아옴 . 
+    // Update : 2024.04.23 by pdg
     prefs = await SharedPreferences.getInstance();
     userId = prefs.getString('userId') ?? ""; // 기본값은 빈 문자열
-    print(" userID : $userId");
+    //print(" userID : $userId");
   }
 
   // 2024.04.22 추가한 함수
@@ -316,7 +353,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     );
   }
 
-  // 2024.04.21 추가한 함수들
+  // 2024.04.21 Updated Below
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
@@ -349,7 +386,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
 
     markers.add(findMarker);
     // 거리계산
-    curPos_to_myArea();
+    _curPosGenCalcDistance();
 
     setState(() {});
   }
@@ -372,7 +409,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   }
 
   // 내 위치와 관심 경작지 위치의 거리를 계산해줌.
-  curPos_to_myArea() async {
+  _curPosGenCalcDistance() async {
     // 현재 위치 파악
     var curPosition = await Geolocator.getCurrentPosition();
     // 내 관심경작지와의 거리 파악
@@ -382,6 +419,9 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
             interestLoc.latitude,
             interestLoc.longitude) /
         1000.0;
+    print(" curloc 변수를 저장합니다. ");
+    curLoc=LatLng(curPosition.latitude,curPosition.longitude);
+    
     setState(() {});
     // return LatLng(curPosition.latitude, curPosition.longitude);
   }
