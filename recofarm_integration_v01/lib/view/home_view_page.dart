@@ -209,6 +209,7 @@ class HomeViewPage extends StatelessWidget {
                                                         child: TextButton(
                                                           onPressed: () {
                                                             // Map으로 연결시켜 등록하게 한다.
+                                                            Get.offNamed("/interestArea");
                                                           },
                                                           child: const Text(
                                                             '등록하기',

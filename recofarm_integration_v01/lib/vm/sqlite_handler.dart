@@ -10,6 +10,7 @@ class DatabaseHandler {
 
   Future<Database> initalizeDB() async {
     String path = await getDatabasesPath();
+    print(path);
     return openDatabase(
       join(path, 'newuser.db'),
       onCreate: (db, version) async {
@@ -27,7 +28,7 @@ class DatabaseHandler {
 
   Future<Map<String, Object?>> userLogin(String userId, String easyPw) async {
     final Database db = await initalizeDB();
-    final List<Map<String, Object?>> result = await db.rawQuery('SELECT * FROM userinfo where userId=$userId and easyPw=$easyPw');
+    final List<Map<String, Object?>> result = await db.rawQuery('SELECT * FROM userinfo where userId="$userId" and easyPw="$easyPw"');
     print(userId);
     print(easyPw);
     print('간편로그인 query 1');
