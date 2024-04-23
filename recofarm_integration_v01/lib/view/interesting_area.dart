@@ -40,6 +40,8 @@ import 'package:syncfusion_flutter_charts/charts.dart';
       2024.04.23 by pdg
         - shared pref 설정 세팅 및 함수 정리 
         - 관심농지로 추가 버튼 눌렀을때  재배작물과 면적을 입력받도록 하자. 
+        - floating action button 을 사용해서 현재위치로 바로가기 기능을 만들자. 
+        - 
   Detail      : - 
 
 */
@@ -181,7 +183,6 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                 focusedBorder: UnderlineInputBorder(
                     borderSide:
                         BorderSide(color: Color.fromARGB(255, 223, 117, 110))),
-                focusColor: Color.fromARGB(255, 239, 214, 214),
                 floatingLabelAlignment: FloatingLabelAlignment.start,
                 labelText: " 소재지 주소 검색",
                 labelStyle: TextStyle(

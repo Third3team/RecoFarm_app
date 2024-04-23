@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:new_recofarm_app/firebase_options.dart';
 import 'package:new_recofarm_app/view/find_my_password.dart';
+import 'package:new_recofarm_app/view/interesting_area.dart';
 import 'package:new_recofarm_app/view/my_area_list.dart';
 import 'package:new_recofarm_app/view/register_page.dart';
 import 'package:new_recofarm_app/view/splash_screen.dart';
@@ -99,9 +100,15 @@ class MyApp extends StatelessWidget {
             transition: Transition.downToUp,
             transitionDuration: const Duration(seconds: 1)),
         GetPage(
-            // 비밀번호 찾기 페이지로 이동
+            // 내 관심 소재지로 이동 
             name: '/MyAreaList',
             page: () => const MyAreaList(),
+            transition: Transition.downToUp,
+            transitionDuration: const Duration(seconds: 1)),
+        GetPage(
+            // 소재지 등록하는 Google map 
+            name: '/interestArea',
+            page: () => const InterestingAreaPage(),
             transition: Transition.downToUp,
             transitionDuration: const Duration(seconds: 1)),
       ],
