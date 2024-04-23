@@ -1,31 +1,30 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:new_recofarm_app/view/edit.dart';
 import 'package:new_recofarm_app/vm/user_firebase.dart';
 
 class DrawerWidget extends StatelessWidget {
-
-  DrawerWidget({super.key, required this.userId});
+  DrawerWidget({Key? key, required this.userId});
 
   final userId;
 
   @override
   Widget build(BuildContext context) {
-
     return Drawer(
       child: StreamBuilder<QuerySnapshot>(
         stream: UserFirebase().selectUserEqaulID(userId),
         builder: (context, snapshot) {
-          if(!snapshot.hasData) {
-            return const Center(child: Text('데이터가 없습니다.'),);
+          if (!snapshot.hasData) {
+            return const Center(
+              child: Text('데이터가 없습니다.'),
+            );
           }
           return ListView(
             padding: EdgeInsets.zero,
             children: [
               UserAccountsDrawerHeader(
                 currentAccountPicture: const CircleAvatar(
-                  // backgroundImage: AssetImage(
-                  //   'images/image1.jpg'
-                  // ),
                   backgroundColor: Colors.amber,
                 ),
                 accountName: Padding(
@@ -51,14 +50,14 @@ class DrawerWidget extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primaryContainer,
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(30),
-                    bottomRight : Radius.circular(30),
-                  )
+                    bottomRight: Radius.circular(30),
+                  ),
                 ),
               ),
               ListTile(
                 leading: const Icon(
                   Icons.home,
-                  color: Colors.red,  
+                  color: Colors.red,
                 ),
                 title: const Text('Home'),
                 onTap: () => {print('home')},
@@ -66,7 +65,7 @@ class DrawerWidget extends StatelessWidget {
               ListTile(
                 leading: const Icon(
                   Icons.home,
-                  color: Colors.red,  
+                  color: Colors.red,
                 ),
                 title: const Text('예측'),
                 onTap: () => {print('')},
@@ -89,16 +88,35 @@ class DrawerWidget extends StatelessWidget {
               ),
               ListTile(
                 leading: const Icon(
+                  Icons.edit,
+                  color: Colors.red,
+                ),
+                title: const Text('회원정보 수정'),
+                onTap: () {
+                  Get.to(
+                    edit(
+                      userId: snapshot.data!.docs[0]['userId'],
+                      userEmail: snapshot.data!.docs[0]['userEmail'],
+                      userPw: snapshot.data!.docs[0]['userPw'],
+                      userName: snapshot.data!.docs[0]['userName'],
+                      userNickName: snapshot.data!.docs[0]['userNickName'],
+                      userPhone: snapshot.data!.docs[0]['userPhone'],
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(
                   Icons.exit_to_app,
                   color: Colors.black,
                 ),
                 title: Text('로그아웃'),
                 onTap: () => {print('home')},
-              )
-            ], // children
+              ),
+            ],
           );
         },
-      ) // ListView
+      ),
     );
   }
 }
