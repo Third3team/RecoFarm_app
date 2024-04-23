@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:new_recofarm_app/view/mainview.dart';
+import 'package:new_recofarm_app/vm/sqlite_handler.dart';
 import 'package:new_recofarm_app/vm/user_firebase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -198,37 +198,37 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
                             // 간편 로그인 Form
                             Column(
                               children: [
-                                Row(
-                                  children: [
-                                    const Expanded(flex: 1, child: Text("  아이디")),
-                                    Expanded(
-                                      flex: 3,
-                                      child: TextFormField(
-                                        style: const TextStyle(
-                                          fontSize: 25,
-                                        ),
-                                        decoration: const InputDecoration(
-                                          contentPadding: EdgeInsets.symmetric(
-                                              vertical: 10.0, horizontal: 10.0),
-                                          isDense: true,
-                                          hintText: "아이디를 입력하세요.",
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(color: Colors.grey),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(color: Colors.red),
-                                          ),
-                                        ),
-                                        keyboardType: TextInputType.emailAddress,
-                                        controller: userIdController,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                // Row(
+                                //   children: [
+                                //     const Expanded(flex: 1, child: Text("  아이디")),
+                                //     Expanded(
+                                //       flex: 3,
+                                //       child: TextFormField(
+                                //         style: const TextStyle(
+                                //           fontSize: 25,
+                                //         ),
+                                //         decoration: const InputDecoration(
+                                //           contentPadding: EdgeInsets.symmetric(
+                                //               vertical: 10.0, horizontal: 10.0),
+                                //           isDense: true,
+                                //           hintText: "아이디를 입력하세요.",
+                                //           enabledBorder: OutlineInputBorder(
+                                //             borderSide: BorderSide(color: Colors.grey),
+                                //           ),
+                                //           focusedBorder: OutlineInputBorder(
+                                //             borderSide: BorderSide(color: Colors.red),
+                                //           ),
+                                //         ),
+                                //         keyboardType: TextInputType.emailAddress,
+                                //         controller: userIdController,
+                                //       ),
+                                //     ),
+                                //   ],
+                                // ),
                                 const SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    const Expanded(flex: 1, child: Text("  비밀번호")),
+                                    const Text("간편비밀번호   "),
                                     Expanded(
                                       flex: 3,
                                       child: TextFormField(
@@ -300,6 +300,20 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
                     setState(() {
                       //showLoading = true;
                     });
+
+                    if(easyLoginUserPwController.text.trim() != '') {
+                      DatabaseHandler dbHandler = DatabaseHandler();
+                      SharedPreferences pref = await SharedPreferences.getInstance();
+                      Map<String,Object?> response = await dbHandler.userLogin(pref.getString('userId').toString(), easyLoginUserPwController.text.trim());
+                      if(response['result'] == false){
+                        print('간편 로그인 실패 ');
+                        // firebaseLoginAction(userId, userPw);
+                      }else {
+                        print('간편 로그인 성공 ');
+                        firebaseLoginAction(response['userId'].toString(), response['userPw'].toString());
+                      }
+                      return;
+                    }
               
                     String userId = userIdController.text.trim();
                     String userPw = userPwController.text.trim();
@@ -392,7 +406,6 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
       // sharedPreferences를 전부 초기화 시키고, 로그인 한 id만 남긴다.
       prefs.clear();
       prefs.setString('userId', userId);
-      
       
       Get.offAll(MainView());
     }
