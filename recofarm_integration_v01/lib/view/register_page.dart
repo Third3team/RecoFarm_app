@@ -199,7 +199,7 @@ class _RegisterPageState extends State<RegisterPage>
                       } else {
                         // registerAction();
                         // nextDialog();
-                        easyLoginSettingDialog();
+                        registerAction();
                       }
                     },
                     child: const Text('다음'),
@@ -310,7 +310,7 @@ class _RegisterPageState extends State<RegisterPage>
                           }
                           else {
                             DatabaseHandler dbHandler = DatabaseHandler();
-                            await dbHandler.insertUserInfo(userIdController.text.trim(), easyPwCotroller.text.trim());
+                            await dbHandler.insertUserInfo(userIdController.text.trim(), userPwController.text.trim(), easyPwCotroller.text.trim());
                             Get.back();
                             loginDialog();
                           }

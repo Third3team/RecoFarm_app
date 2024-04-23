@@ -35,9 +35,8 @@ void main() async {
 
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  SharedPreferences preferences = await SharedPreferences.getInstance();
-  await preferences.clear();
-
+  // SharedPreferences preferences = await SharedPreferences.getInstance();
+  // await preferences.clear();
   runApp(const MyApp());
 }
 
