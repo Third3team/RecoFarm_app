@@ -1,14 +1,15 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:new_recofarm_app/model/user_area.dart';
 import 'package:new_recofarm_app/model/user_model.dart';
 import 'package:new_recofarm_app/view/detail_cabbageapi.dart';
 import 'package:new_recofarm_app/view/drawer_widget.dart';
 import 'package:new_recofarm_app/view/predict_yield.dart';
 import 'package:new_recofarm_app/vm/napacabbage_price_api.dart';
 import 'package:new_recofarm_app/vm/user_firebase.dart';
+import 'package:new_recofarm_app/vm/user_mysql.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /*
@@ -44,12 +45,6 @@ class HomeViewPage extends StatelessWidget {
           return Scaffold(
               appBar: AppBar(
                 title: const Text('Reco Farm'),
-                actions: [
-                  // IconButton(
-                  //   onPressed: () {},
-                  //   icon: const Icon(Icons.search)
-                  // )
-                ],
               ),
               drawer: DrawerWidget(userId: userId),
               body: SingleChildScrollView(
@@ -57,12 +52,12 @@ class HomeViewPage extends StatelessWidget {
                   stream: UserFirebase().selectUserEqaulID(userId),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      final UserModel userModel = UserModel(
-                        name: snapshot.data!.docs[0]['userName'],
-                        // phone: snapshot.data!.docs[0]['phone'],
-                        // nickName: snapshot.data!.docs[0]['nickname'],
-                        // userImagePath: snapshot.data!.docs[0]['image']
-                      );
+                      // final UserModel userModel = UserModel(
+                      //   name: snapshot.data!.docs[0]['userName'],
+                      //   phone: snapshot.data!.docs[0]['phone'],
+                      //   nickName: snapshot.data!.docs[0]['nickname'],
+                      //   userImagePath: snapshot.data!.docs[0]['image']
+                      // );
                       // 불러온 데이터가 있을 때,
                       return Center(
                         child: Column(
@@ -81,7 +76,7 @@ class HomeViewPage extends StatelessWidget {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            '${userModel.name}  ',
+                                            '${snapshot.data!.docs[0]['userName']}  ',
                                             style: const TextStyle(
                                                 fontSize: 30,
                                                 fontWeight: FontWeight.bold),
@@ -104,7 +99,7 @@ class HomeViewPage extends StatelessWidget {
                                           );
                                         },
                                         itemCount: 3,
-                                        pagination: SwiperPagination(),
+                                        pagination: const SwiperPagination(),
                                       ),
                                     ),
                                   ],
@@ -114,7 +109,7 @@ class HomeViewPage extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(0, 15, 0, 30),
                               child: Container(
-                                color: Color.fromARGB(255, 222, 216, 216),
+                                color: const Color.fromARGB(255, 222, 216, 216),
                                 width: MediaQuery.of(context).size.width,
                                 height: 5,
                               ),
@@ -337,6 +332,10 @@ class HomeViewPage extends StatelessWidget {
                                   ),
                                 ),
                               ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => UserMySQL().getAreaData('lcy'), 
+                              child: const Text('test')
                             )
                           ],
                         ),

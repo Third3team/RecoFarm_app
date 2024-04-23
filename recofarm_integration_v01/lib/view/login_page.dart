@@ -38,7 +38,6 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
     super.initState();
     // WidgetsBindingObserver 기능을 받아야 함. (with)
     WidgetsBinding.instance.addObserver(this);
-    // initSharedPreferences() => SharedPreferences 초기화  
     alreadyExistUserInfo();
   }
 
@@ -47,18 +46,18 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
 @override
 void didChangeAppLifecycleState(AppLifecycleState state) async {
   super.didChangeAppLifecycleState(state);
+    final prefs = await SharedPreferences.getInstance();
+    prefs.clear();
   switch(state) {
     // 다른 앱으로 전환했을 때,
     case AppLifecycleState.detached :
       break;
     // 앱이 다시 실행되었을 때,
     case AppLifecycleState.resumed :
-      final prefs = await SharedPreferences.getInstance();
 		  prefs.clear();
       break;
     // 앱이 완전히 종료되었을 때,
     case AppLifecycleState.inactive :
-		  final prefs = await SharedPreferences.getInstance();
 		  prefs.clear();
 	    break;
     // 앱이 중지되었을 떄,
@@ -68,6 +67,11 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
       break;
   }
 }
+
+@override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -265,13 +269,12 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
   alreadyExistUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
 
-    String userId = prefs.get('userId').toString();
-    String userPw = prefs.get('userPw').toString();
+    String userId = prefs.get('userId') != null ? prefs.get('userId').toString() : "";
+    String userPw = prefs.get('userPw') != null ? prefs.get('userPw').toString() : "";
 
-    print('12: $userId');
-    print('12: $userPw');
-    if(userId.isNotEmpty) {
-      print(userId);
+    print('ID: $userId');
+    print('PW: $userPw');
+    if(userId != "" && userPw != "") {
       firebaseLoginAction(userId, userPw);
     }
   }

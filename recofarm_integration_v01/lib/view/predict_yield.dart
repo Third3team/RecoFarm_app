@@ -256,8 +256,6 @@ class PredictYield extends StatelessWidget {
     );
 
     print(result.toString());
-    // students.addAll(result);
-    // setState(() {});
   }
 
   errorSnackBar(context, String text) {

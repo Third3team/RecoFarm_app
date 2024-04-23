@@ -56,30 +56,6 @@ class _RegisterPageState extends State<RegisterPage>
   void dispose() {
     super.dispose();
   }
-  // initSharedPreferences() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   userIdController.text = prefs.getString('p_userid') ?? "";
-  //   userPwController.text = prefs.getString('p_userpw') ?? "";
-  //   userNameController.text = prefs.getString('p_username') ?? "";
-  // }
-
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   super.didChangeAppLifecycleState(state);
-  //   switch (state) {
-  //     case AppLifecycleState.inactive:
-  //       disposeSharedPreferences();
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // }
-
-  // disposeSharedPreferences() async {
-  //   // shared preference instance 생성 
-  //   final prefs = await SharedPreferences.getInstance();
-  //   prefs.clear();
-  // }
 
   @override
   Widget build(BuildContext context) {
