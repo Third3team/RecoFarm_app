@@ -1,10 +1,8 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:new_recofarm_app/model/user_area.dart';
-import 'package:new_recofarm_app/model/user_model.dart';
 import 'package:new_recofarm_app/view/detail_cabbageapi.dart';
 import 'package:new_recofarm_app/view/drawer_widget.dart';
 import 'package:new_recofarm_app/view/predict_yield.dart';
@@ -460,10 +458,6 @@ class HomeViewPage extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            ElevatedButton(
-                              onPressed: () => UserMySQL().getAreaData('lcy'), 
-                              child: const Text('test')
-                            )
                           ],
                         ),
                       );
