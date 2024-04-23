@@ -27,16 +27,47 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
   // userId, userPw  text field 
   TextEditingController userIdController = TextEditingController();
   TextEditingController userPwController = TextEditingController();
 
+
   @override
   void initState() {
     super.initState();
+    // WidgetsBindingObserver 기능을 받아야 함. (with)
+    WidgetsBinding.instance.addObserver(this);
+    // initSharedPreferences() => SharedPreferences 초기화  
     alreadyExistUserInfo();
   }
+
+// AppLifecycle의 state가 변경 되었을 때,
+// 따라서 앱이 종료되었을때 SharedPreferences 초기화 해준다.
+@override
+void didChangeAppLifecycleState(AppLifecycleState state) async {
+  super.didChangeAppLifecycleState(state);
+  switch(state) {
+    // 다른 앱으로 전환했을 때,
+    case AppLifecycleState.detached :
+      break;
+    // 앱이 다시 실행되었을 때,
+    case AppLifecycleState.resumed :
+      final prefs = await SharedPreferences.getInstance();
+		  prefs.clear();
+      break;
+    // 앱이 완전히 종료되었을 때,
+    case AppLifecycleState.inactive :
+		  final prefs = await SharedPreferences.getInstance();
+		  prefs.clear();
+	    break;
+    // 앱이 중지되었을 떄,
+    case AppLifecycleState.paused :
+      break;
+    default :
+      break;
+  }
+}
 
   @override
   Widget build(BuildContext context) {
