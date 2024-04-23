@@ -1,8 +1,11 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:new_recofarm_app/model/user_area.dart';
+import 'package:new_recofarm_app/model/user_model.dart';
 import 'package:new_recofarm_app/view/detail_cabbageapi.dart';
 import 'package:new_recofarm_app/view/drawer_widget.dart';
 import 'package:new_recofarm_app/view/predict_price.dart';
@@ -23,11 +26,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 */
 
 class HomeViewPage extends StatelessWidget {
-  String userId = '';
+  String? userId = '';
 
   initSharedPreferences() async {
     final pref = await SharedPreferences.getInstance();
-    userId = pref.getString('userId')!;
+    userId =
+        pref.getString('userId') ?? FirebaseAuth.instance.currentUser?.email;
   }
 
   HomeViewPage({super.key});
@@ -38,7 +42,7 @@ class HomeViewPage extends StatelessWidget {
     final NapaCabbageAPI cabbageController = Get.put(NapaCabbageAPI());
     cabbageController.fetchXmlData();
 
-    final Future<List<UserArea>> areaList = UserMySQL().getAreaData(userId);
+    final Future<List<UserArea>> areaList = UserMySQL().getAreaData(userId!);
 
     return FutureBuilder(
       future: initSharedPreferences(),
@@ -51,9 +55,20 @@ class HomeViewPage extends StatelessWidget {
               drawer: DrawerWidget(userId: userId),
               body: SingleChildScrollView(
                 child: StreamBuilder<QuerySnapshot>(
-                  stream: UserFirebase().selectUserEqaulID(userId),
+                  stream: UserFirebase().selectUserEqaulID(userId!),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
+                      final UserModel userModel = UserModel(
+                        name: snapshot.data!.docs.isNotEmpty
+                            ? snapshot.data!.docs[0]['userName']
+                            : FirebaseAuth.instance.currentUser?.displayName ??
+                                '',
+                        // phone: snapshot.data!.docs[0]['phone'],
+                        // nickName: snapshot.data!.docs[0]['nickname'],
+                        // userImagePath: snapshot.data!.docs[0]['image']
+                      );
+                      // 불러온 데이터가 있을 때,
+
                       return Center(
                         child: Column(
                           children: [

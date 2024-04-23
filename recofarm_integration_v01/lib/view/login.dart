@@ -2,44 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get/get.dart';
 
-/*
-  Description : Login Page 
-  Date        : 2024.04.20 Sat
-  Author      : Forrest DongGeun Park. (PDG)
-  Updates     : 
-	  2024.0420 Sat by pdg
-		  - 로그인 페이지  이메일이 아니라 아이디 비밀번호로 바꿈 
-      - 테마 및 글자 크기 변경함. 
-      - firebase setting 모두 삭제 
-
-  Detail      : - 
-
-*/
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // userId, userPw  text field 
   TextEditingController userIdController = TextEditingController();
   TextEditingController userPwController = TextEditingController();
 
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  GoogleSignIn _googleSignIn = GoogleSignIn();
 
   bool showLoading = false;
 
   Future<void> signInWithEmailAndPassword(String email, String password) async {
     try {
-      // Firebase에 이메일과 비밀번호로 로그인을 시도합니다.
       await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // 로그인 완료 메시지 표시
       Fluttertoast.showToast(
         msg: "로그인 완료!",
         toastLength: Toast.LENGTH_SHORT,
@@ -75,6 +61,60 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleSignInAccount =
+          await _googleSignIn.signIn();
+      if (googleSignInAccount != null) {
+        final GoogleSignInAuthentication googleSignInAuthentication =
+            await googleSignInAccount.authentication;
+
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleSignInAuthentication.accessToken,
+          idToken: googleSignInAuthentication.idToken,
+        );
+
+        await _firebaseAuth.signInWithCredential(credential);
+
+        Fluttertoast.showToast(
+          msg: "구글 로그인 완료!",
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          fontSize: 16.0,
+        );
+
+        setState(() {
+          showLoading = false;
+        });
+      } else {
+        // 구글 로그인 취소 시
+        setState(() {
+          showLoading = false;
+        });
+        Fluttertoast.showToast(
+          msg: "구글 로그인이 취소되었습니다.",
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          fontSize: 16.0,
+        );
+      }
+    } catch (error) {
+      setState(() {
+        showLoading = false;
+      });
+      print(error);
+      Fluttertoast.showToast(
+        msg: "구글 로그인 중 오류가 발생했습니다.",
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        fontSize: 16.0,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
@@ -96,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const SizedBox(height: 50.0), // 상단 패딩 추가
+                const SizedBox(height: 50.0),
                 Image.asset(
                   "images/farmer.png",
                   height: 200,
@@ -158,13 +198,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
                 SizedBox(height: 20),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        // 회원 가입 페이지로 이동
                         Get.toNamed('/register');
                       },
                       style: ElevatedButton.styleFrom(
@@ -209,10 +247,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           });
                           return;
                         }
-                        // my SQL 로그인
 
-                        await mySQL_login(userId, userPw);
-                        // Firebase에 이메일과 비밀번호로 로그인
                         await signInWithEmailAndPassword(userId, userPw);
                       },
                     ),
@@ -221,7 +256,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        // 비밀번호찾기 페이지로 이동
                         Get.toNamed('/findPw');
                       },
                       style: ElevatedButton.styleFrom(
@@ -236,19 +270,43 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 30,),
-
+                SizedBox(
+                  height: 30,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     IconButton(
-                      onPressed: (){}, 
-                      icon:Image.asset("images/naver/btnW_.png",
-                    width: 100,), )
-
-                    
+                      onPressed: () {},
+                      icon: Image.asset(
+                        "images/naver/btnW_.png",
+                        width: 100,
+                      ),
+                    ),
+                    // Google Sign-In Button
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        setState(() {
+                          showLoading = true;
+                        });
+                        // 구글 로그인 메서드 호출
+                        await signInWithGoogle();
+                      },
+                      icon: Image.asset(
+                        "images/naver/btnW_.png",
+                        width: 30,
+                        height: 30,
+                      ),
+                      label: Text('구글 로그인'),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                      ),
+                    ),
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -297,9 +355,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  //Function
-
   mySQL_login(userId, UserPw) async {
     print("user id : $userId");
   }
-} //ENd
+}
