@@ -377,21 +377,13 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                     width: 100,
                   ),
                 ),
-                ElevatedButton.icon(
+                IconButton(
                   onPressed: () async {
                     await signInWithGoogle();
                   },
                   icon: Image.asset(
                     "images/naver/btnW_.png",
-                    width: 30,
-                    height: 30,
-                  ),
-                  label: Text('구글 로그인'),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
+                    width: 100,
                   ),
                 ),
               ],

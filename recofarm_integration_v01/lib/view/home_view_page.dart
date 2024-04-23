@@ -85,7 +85,14 @@ class HomeViewPage extends StatelessWidget {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            '${snapshot.data!.docs[0]['userName']}  ',
+                                            snapshot.data!.docs.isNotEmpty
+                                                ? snapshot.data!.docs[0]
+                                                    ['userName']
+                                                : FirebaseAuth
+                                                        .instance
+                                                        .currentUser
+                                                        ?.displayName ??
+                                                    '',
                                             style: const TextStyle(
                                                 fontSize: 30,
                                                 fontWeight: FontWeight.bold),
