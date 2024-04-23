@@ -15,10 +15,11 @@ class PredictYield extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.amber[100],
         title: const Text(
           '수확량 예측하기',
           style: TextStyle(
-            fontSize: 30
+            fontSize: 35
           ),
         ),
       ),

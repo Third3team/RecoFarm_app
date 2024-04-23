@@ -52,13 +52,13 @@ class _DetailCabbageState extends State<DetailCabbage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           '배추 가격 현황',
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            fontSize: 35
           ),
         ),
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        backgroundColor: Colors.amber[100],
       ),
       body: SingleChildScrollView(
         child: Center(

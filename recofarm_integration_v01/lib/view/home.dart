@@ -1,9 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:new_recofarm_app/view/find_my_password.dart';
 import 'package:new_recofarm_app/view/interesting_area.dart';
-import 'package:new_recofarm_app/view/login_page.dart';
 import 'package:new_recofarm_app/view/login_page.dart';
 import 'package:new_recofarm_app/view/mainview.dart';
 import 'package:new_recofarm_app/view/register_page.dart';
