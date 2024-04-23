@@ -1,5 +1,6 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,11 +23,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 */
 
 class HomeViewPage extends StatelessWidget {
-  String userId = '';
+  String? userId = '';
 
   initSharedPreferences() async {
     final pref = await SharedPreferences.getInstance();
-    userId = pref.getString('userId')!;
+    userId =
+        pref.getString('userId') ?? FirebaseAuth.instance.currentUser?.email;
   }
 
   HomeViewPage({super.key});
@@ -54,11 +56,14 @@ class HomeViewPage extends StatelessWidget {
               drawer: DrawerWidget(userId: userId),
               body: SingleChildScrollView(
                 child: StreamBuilder<QuerySnapshot>(
-                  stream: UserFirebase().selectUserEqaulID(userId),
+                  stream: UserFirebase().selectUserEqaulID(userId!),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final UserModel userModel = UserModel(
-                        name: snapshot.data!.docs[0]['userName'],
+                        name: snapshot.data!.docs.isNotEmpty
+                            ? snapshot.data!.docs[0]['userName']
+                            : FirebaseAuth.instance.currentUser?.displayName ??
+                                '',
                         // phone: snapshot.data!.docs[0]['phone'],
                         // nickName: snapshot.data!.docs[0]['nickname'],
                         // userImagePath: snapshot.data!.docs[0]['image']

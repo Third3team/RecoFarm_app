@@ -3,71 +3,56 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:new_recofarm_app/view/home_view_page.dart';
 import 'package:new_recofarm_app/view/mainview.dart';
 import 'package:new_recofarm_app/vm/user_firebase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-/*
-  Description : Login Page 
-  Date        : 2024.04.21 sun
-  Author      : Forrest DongGeun Park. (PDG)
-  Updates     : 
-
-    2024.04.21 by pdg
-      -fire base 없는 버전으로 페이지 버전 2 생성
-  Detail      : - 
-
-*/
-
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
-  // userId, userPw  text field 
   TextEditingController userIdController = TextEditingController();
   TextEditingController userPwController = TextEditingController();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
+  // 사용자 정보를 저장할 변수
+  String? userEmail;
+  String? userName;
 
   @override
   void initState() {
     super.initState();
-    // WidgetsBindingObserver 기능을 받아야 함. (with)
-    WidgetsBinding.instance.addObserver(this);
-    // initSharedPreferences() => SharedPreferences 초기화  
+    WidgetsBinding.instance!.addObserver(this);
     alreadyExistUserInfo();
   }
 
-// AppLifecycle의 state가 변경 되었을 때,
-// 따라서 앱이 종료되었을때 SharedPreferences 초기화 해준다.
-@override
-void didChangeAppLifecycleState(AppLifecycleState state) async {
-  super.didChangeAppLifecycleState(state);
-  switch(state) {
-    // 다른 앱으로 전환했을 때,
-    case AppLifecycleState.detached :
-      break;
-    // 앱이 다시 실행되었을 때,
-    case AppLifecycleState.resumed :
-      final prefs = await SharedPreferences.getInstance();
-		  prefs.clear();
-      break;
-    // 앱이 완전히 종료되었을 때,
-    case AppLifecycleState.inactive :
-		  final prefs = await SharedPreferences.getInstance();
-		  prefs.clear();
-	    break;
-    // 앱이 중지되었을 떄,
-    case AppLifecycleState.paused :
-      break;
-    default :
-      break;
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.detached:
+        break;
+      case AppLifecycleState.resumed:
+        final prefs = await SharedPreferences.getInstance();
+        prefs.clear();
+        break;
+      case AppLifecycleState.inactive:
+        final prefs = await SharedPreferences.getInstance();
+        prefs.clear();
+        break;
+      case AppLifecycleState.paused:
+        break;
+      default:
+        break;
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +79,7 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 50.0), // 상단 패딩 추가
+                  const SizedBox(height: 50.0),
                   Image.asset(
                     "images/farmer.png",
                     height: 200,
@@ -156,7 +141,6 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
                     ],
                   ),
                   SizedBox(height: 20),
-        
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -171,8 +155,8 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
                                     BorderRadius.all(Radius.circular(15)))),
                         child: const Text(
                           '회원가입하기',
-                          style:
-                              TextStyle(color: Color.fromARGB(255, 78, 101, 121)),
+                          style: TextStyle(
+                              color: Color.fromARGB(255, 78, 101, 121)),
                         ),
                       ),
                       SizedBox(
@@ -190,10 +174,10 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
                           setState(() {
                             //showLoading = true;
                           });
-        
+
                           String userId = userIdController.text.trim();
                           String userPw = userPwController.text.trim();
-        
+
                           if (userId.isEmpty || userPw.isEmpty) {
                             Fluttertoast.showToast(
                               msg: "아이디와 비밀번호를 입력해 주세요.",
@@ -207,17 +191,11 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
                             });
                             return;
                           }
-                          // my SQL 로그인
-        
-                          // await mySQL_login(userId, userPw);
-                          // Firebase에 이메일과 비밀번호로 로그인
-                          //await signInWithEmailAndPassword(userId, userPw);
-
                           firebaseLoginAction(userId, userPw);
                         },
                       ),
                       SizedBox(
-                        width: 10,     
+                        width: 10,
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -236,17 +214,41 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
                       ),
                     ],
                   ),
-                  SizedBox(height: 30,),
-        
+                  SizedBox(
+                    height: 30,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       IconButton(
-                        onPressed: (){}, 
-                        icon:Image.asset("images/naver/btnW_.png",
-                      width: 100,), )
+                        onPressed: () {},
+                        icon: Image.asset(
+                          "images/naver/btnW_.png",
+                          width: 100,
+                        ),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          await signInWithGoogle();
+                        },
+                        icon: Image.asset(
+                          "images/naver/btnW_.png",
+                          width: 30,
+                          height: 30,
+                        ),
+                        label: Text('구글 로그인'),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                        ),
+                      ),
                     ],
-                  )
+                  ),
+                  // 사용자 정보 출력
+                  //if (userEmail != null) Text('이메일: $userEmail'),
+                  //if (userName != null) Text('이름: $userName'),
                 ],
               ),
             ),
@@ -255,8 +257,6 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
       ),
     );
   }
-
-  //Function
 
   mySQL_login(userId, UserPw) async {
     print("user id : $userId");
@@ -270,7 +270,7 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
 
     print('12: $userId');
     print('12: $userPw');
-    if(userId.isNotEmpty) {
+    if (userId.isNotEmpty) {
       print(userId);
       firebaseLoginAction(userId, userPw);
     }
@@ -280,17 +280,14 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
     UserFirebase user = UserFirebase();
     final response = await user.checkUser(userId, userPw);
 
-    if(response) {
+    if (response) {
       print('로그인 완료!');
 
       final prefs = await SharedPreferences.getInstance();
-      // sharedPreferences를 전부 초기화 시키고, 로그인 한 id만 남긴다.
       prefs.clear();
       prefs.setString('userId', userId);
-      
-      Get.offAll(MainView());
-    }
-    else {  
+      Get.to(HomeViewPage());
+    } else {
       print('로그인 불가');
       Fluttertoast.showToast(
         msg: "아이디와 비밀번호를 확인해주세요.",
@@ -301,4 +298,44 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
       );
     }
   }
-} //ENd
+
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleSignInAccount =
+          await _googleSignIn.signIn();
+      if (googleSignInAccount != null) {
+        final GoogleSignInAuthentication googleSignInAuthentication =
+            await googleSignInAccount.authentication;
+
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleSignInAuthentication.accessToken,
+          idToken: googleSignInAuthentication.idToken,
+        );
+
+        final UserCredential userCredential =
+            await _firebaseAuth.signInWithCredential(credential);
+        final User? user = userCredential.user;
+
+        // 사용자 정보 업데이트
+        setState(() {
+          userEmail = user?.email;
+          userName = user?.displayName;
+        });
+
+        print("Google user: $user");
+
+        // 페이지 이동
+        Get.to(HomeViewPage());
+      }
+    } catch (error) {
+      print(error);
+      Fluttertoast.showToast(
+        msg: "Google 로그인에 실패했습니다.",
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        fontSize: 16.0,
+      );
+    }
+  }
+}
