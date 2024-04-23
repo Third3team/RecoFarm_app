@@ -8,6 +8,7 @@ import 'package:new_recofarm_app/model/user_area.dart';
 import 'package:new_recofarm_app/model/user_model.dart';
 import 'package:new_recofarm_app/view/detail_cabbageapi.dart';
 import 'package:new_recofarm_app/view/drawer_widget.dart';
+import 'package:new_recofarm_app/view/predict_price.dart';
 import 'package:new_recofarm_app/view/predict_yield.dart';
 import 'package:new_recofarm_app/vm/napacabbage_price_api.dart';
 import 'package:new_recofarm_app/vm/user_firebase.dart';
@@ -477,7 +478,7 @@ class HomeViewPage extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(0, 30, 0, 50),
                               child: GestureDetector(
-                                onTap: () => print('12312312'),
+                                onTap: () => Get.to(Predict_Price()),
                                 child: Container(
                                   color: Theme.of(context)
                                       .colorScheme
