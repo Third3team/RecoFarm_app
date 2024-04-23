@@ -116,8 +116,8 @@ class DrawerWidget extends StatelessWidget {
                 title: Text('로그아웃'),
 
                 onTap: () async {
-                  SharedPreferences preferences = await SharedPreferences.getInstance();
-                  preferences.clear();
+                  // SharedPreferences preferences = await SharedPreferences.getInstance();
+                  // preferences.clear();
                   Fluttertoast.showToast(
                     msg: "로그아웃 되었습니다.",
                     toastLength: Toast.LENGTH_SHORT,

@@ -1,4 +1,3 @@
-import 'package:new_recofarm_app/model/interesting_area_model.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 /* 
@@ -12,12 +11,13 @@ class DatabaseHandler {
   Future<Database> initalizeDB() async {
     String path = await getDatabasesPath();
     return openDatabase(
-      join(path, 'user.db'),
+      join(path, 'newuser.db'),
       onCreate: (db, version) async {
         await db.execute(
           'CREATE TABLE userinfo '
           '(seq integer primary key autoincrement,'
           'userId text(50),'
+          'userPw text(50),'
           'easyPw text(6))'
         );
       },
@@ -25,20 +25,39 @@ class DatabaseHandler {
     );
   }
 
-  // Future<List<Area>> queryReview() async {
-  //   final Database db = await initalizeDB();
-  //   final List<Map<String, Object?>> result = await db.rawQuery('SELECT * FROM place');
+  Future<Map<String, Object?>> userLogin(String userId, String easyPw) async {
+    final Database db = await initalizeDB();
+    final List<Map<String, Object?>> result = await db.rawQuery('SELECT * FROM userinfo where userId=$userId and easyPw=$easyPw');
+    print(userId);
+    print(easyPw);
+    print('간편로그인 query 1');
+    if(result.isEmpty) {
+      return Future(() => {'result' : false});
+    }
+    print('간편로그인 query 2');
+    final response = result[0];
+    print('간편로그인 query 3');
+    if(response.isEmpty) {
+      print('비어있음 ');
+      return Future(() => {'result' : false});
+    }
+    else {
+      print('존재함');
+      print('id : ${response['userId']}');
+      print('pw : ${response['userPw']}');
+      print('pw : ${response['easyPw']}');
+    }
+    print('간편로그인 query 4');
+    return response;
+  }
 
-  //   return result.map((e) => Area.fromMap(e)).toList();
-  // }
-
-  Future<void> insertUserInfo(String userId, String easyPw) async {
+  Future<void> insertUserInfo(String userId, String userPw, String easyPw) async {
     final Database db = await initalizeDB();
     await db.rawInsert(
       'INSERT INTO userinfo '
-      '(userId,easyPw) '
-      'VALUES (?,?)',
-      [userId, easyPw]
+      '(userId,userPw,easyPw) '
+      'VALUES (?,?,?)',
+      [userId, userPw, easyPw]
     );
   }
 
