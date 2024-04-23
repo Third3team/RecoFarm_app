@@ -43,7 +43,10 @@ import 'package:syncfusion_flutter_charts/charts.dart';
         - shared pref 설정 세팅 및 함수 정리 
         - 관심농지로 추가 버튼 눌렀을때  재배작물과 면적을 입력받도록 하자. 
         - floating action button 을 사용해서 현재위치로 바로가기 기능을 만들자. 
-        - 
+      2024.04.24 by pdg 
+        - 지도에 마커 뜨도록 하는 기능 
+          -> 마커 색상 변경 
+
   Detail      : - 
 
 */
@@ -58,23 +61,25 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   // properties
   late TextEditingController locationTfController;
   // Geometric properties
-  late LatLng? curLoc;
-  late LatLng interestLoc;
-  late bool islocationEnable;
+  late LatLng? curLoc; // 현재 위치 위도경도 
+  late LatLng interestLoc; // 관심 위치 위도 경도 ( 검색시 입력값이 들어감. )
+  late bool islocationEnable; // 지도 권한 ok -> true 
   // Marker
-  late Marker curLocMarker;
-  late Marker myloc1;
-  late Marker? findMarker;
+  late Marker curLocMarker; // 현재위치 마커 
+  late Marker myloc1; // 기본
+  late Marker? findMarker; // 검색한 위치의 마커 
 
   late Circle myAreaCircle;
   late double myAreaMeterSquare;
   late double myAreaRadius;
   late double distance1;
+
+  // 검색한 주소의 Formatted address 
   late String searchedAddress;
   // google map 컨트롤러!!
   late GoogleMapController mapController;
   // markers
-  late List markers;
+  late List markers; // 내가 검색한 장소들이 다 들어가 있음. 
   late List myareaMarkerList;
   // myarea
   late List myareaData;
@@ -281,7 +286,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     );
   }
 
-  // Function
+  // Functions
   // 2024.04.23 updated
   _showBottomSheetForInput() {
     // Desc : 관심 농작품과 재배면적 을 받는 bottom sheet
