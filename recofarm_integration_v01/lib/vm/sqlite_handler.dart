@@ -12,39 +12,35 @@ class DatabaseHandler {
   Future<Database> initalizeDB() async {
     String path = await getDatabasesPath();
     return openDatabase(
-      join(path, 'intersteplace.db'),
+      join(path, 'user.db'),
       onCreate: (db, version) async {
         await db.execute(
-          'CREATE TABLE place '
+          'CREATE TABLE userinfo '
           '(seq integer primary key autoincrement,'
-          'name text(50),'
-          'area numeric(50)'
-          'lat numeric(30),'
-          'long numeric(30),'
+          'userId text(50),'
+          'easyPw text(6))'
         );
       },
       version: 1,
     );
   }
 
-  Future<List<Area>> queryReview() async {
-    final Database db = await initalizeDB();
-    final List<Map<String, Object?>> result = await db.rawQuery('SELECT * FROM place');
-
-    return result.map((e) => Area.fromMap(e)).toList();
-  }
-
-  // Future<int> insertReview(Area review) async {
+  // Future<List<Area>> queryReview() async {
   //   final Database db = await initalizeDB();
-  //   int result;
-  //   result = await db.rawInsert(
-  //     'INSERT INTO musteatplace '
-  //     '(name,phone,lat,long,image,estimate,initdate) '
-  //     'VALUES (?,?,?,?,?,?,?)',
-  //     [review.name, review.phone, review.lat, review.long, review.image, review.estimate, review.initdate]
-  //   );
-  //   return result;
+  //   final List<Map<String, Object?>> result = await db.rawQuery('SELECT * FROM place');
+
+  //   return result.map((e) => Area.fromMap(e)).toList();
   // }
+
+  Future<void> insertUserInfo(String userId, String easyPw) async {
+    final Database db = await initalizeDB();
+    await db.rawInsert(
+      'INSERT INTO userinfo '
+      '(userId,easyPw) '
+      'VALUES (?,?)',
+      [userId, easyPw]
+    );
+  }
 
   // Future<int> updateReview(Review review) async {
   //   final Database db = await initalizeDB();
