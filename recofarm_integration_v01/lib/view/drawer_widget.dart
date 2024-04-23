@@ -5,8 +5,8 @@ import 'package:new_recofarm_app/view/edit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:new_recofarm_app/view/login_page.dart';
+import 'package:new_recofarm_app/view/predict_yield.dart';
 import 'package:new_recofarm_app/vm/user_firebase.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerWidget extends StatelessWidget {
   DrawerWidget({Key? key, required this.userId});
@@ -26,7 +26,6 @@ class DrawerWidget extends StatelessWidget {
               child: Text('데이터가 없습니다.'),
             );
           }
-
           if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
             userName = snapshot.data!.docs[0]['userName'] ??
                 FirebaseAuth.instance.currentUser?.displayName;
@@ -57,79 +56,74 @@ class DrawerWidget extends StatelessWidget {
                 accountEmail: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                   child: Text(
-                    userEmail ?? '사용자 이름',
+                    userEmail ?? '사용자 Email',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                     ),
                   ),
                 ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
+                  color: Colors.amber[100],
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(30),
                     bottomRight: Radius.circular(30),
                   ),
                 ),
               ),
+              if (snapshot.hasData && snapshot.data!.docs.isNotEmpty)
               ListTile(
                 leading: const Icon(
-                  Icons.home,
+                  Icons.edit,
                   color: Colors.red,
                 ),
-                title: const Text('Home'),
-                onTap: () => {print('home')},
+                title: const Text('회원정보 수정'),
+                onTap: () {
+                  Get.to(
+                    edit(
+                      userId: snapshot.data!.docs[0]['userId'],
+                      userEmail: snapshot.data!.docs[0]['userEmail'],
+                      userPw: snapshot.data!.docs[0]['userPw'],
+                      userName: snapshot.data!.docs[0]['userName'],
+                      userNickName: snapshot.data!.docs[0]['userNickName'],
+                      userPhone: snapshot.data!.docs[0]['userPhone'],
+                    ),
+                  );
+                },
               ),
               ListTile(
                 leading: const Icon(
-                  Icons.home,
-                  color: Colors.red,
+                  // Icons.area_chart,
+                  // Icons.multiline_chart,
+                  Icons.bar_chart,
+                  color: Colors.cyan,
                 ),
-                title: const Text('예측'),
-                onTap: () => {print('')},
-              ),
-              ListTile(
-                leading: const Icon(
-                  Icons.settings,
-                  color: Colors.blue,
-                ),
-                title: Text('설정'),
-                onTap: () => {print('home')},
+                title: const Text('수확량 예측'),
+                onTap: () => {
+                  Get.to(PredictYield())
+                },
               ),
               ListTile(
                 leading: const Icon(
                   Icons.question_answer,
                   color: Colors.orange,
                 ),
-                title: Text('공지사항'),
+                title: const Text('공지사항'),
                 onTap: () => {print('home')},
               ),
-              if (snapshot.hasData && snapshot.data!.docs.isNotEmpty)
-                ListTile(
-                  leading: const Icon(
-                    Icons.edit,
-                    color: Colors.red,
-                  ),
-                  title: const Text('회원정보 수정'),
-                  onTap: () {
-                    Get.to(
-                      edit(
-                        userId: snapshot.data!.docs[0]['userId'],
-                        userEmail: snapshot.data!.docs[0]['userEmail'],
-                        userPw: snapshot.data!.docs[0]['userPw'],
-                        userName: snapshot.data!.docs[0]['userName'],
-                        userNickName: snapshot.data!.docs[0]['userNickName'],
-                        userPhone: snapshot.data!.docs[0]['userPhone'],
-                      ),
-                    );
-                  },
+              ListTile(
+                leading: const Icon(
+                  Icons.settings,
+                  color: Colors.blue,
                 ),
+                title: const Text('설정'),
+                onTap: () => {print('home')},
+              ),
               ListTile(
                 leading: const Icon(
                   Icons.exit_to_app,
                   color: Colors.black,
                 ),
-                title: Text('로그아웃'),
-
+                title: const Text('로그아웃'),
                 onTap: () async {
                   // SharedPreferences preferences = await SharedPreferences.getInstance();
                   // preferences.clear();

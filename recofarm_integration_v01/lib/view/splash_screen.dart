@@ -1,13 +1,7 @@
 import 'dart:async';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:new_recofarm_app/view/login.dart';
-
-import 'home.dart';
 /*
   * Description : Splash screen  
   * Date        : 2024.04.20
@@ -56,14 +50,14 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     }
 
-    _progressTimer = Timer.periodic(Duration(milliseconds: 200), (timer) {
+    _progressTimer = Timer.periodic(const Duration(milliseconds: 200), (timer) {
       _updateProgress();
       if (_progressValue >= 1.0) {
         _progressTimer.cancel();
       }
     });
 
-    _timer = Timer.periodic(Duration(seconds: 2), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
       //2 초에 한번씩 페이지가 넘어가는 스플래쉬 제작
       int? nextpage = pageController.page?.toInt();
       if (nextpage == null) {
@@ -71,16 +65,13 @@ class _SplashScreenState extends State<SplashScreen> {
       }
       if (nextpage == 1) {
         // splash 화면이 다되면 메인으로 넘어감.
-        // Get.toNamed(
-        //   "/home",
-        // );
-        Get.offNamed("/home");
+        Get.offAllNamed("/login");
         _timer.cancel();
       } else {
         nextpage++;
       }
       pageController.animateToPage(nextpage,
-          duration: Duration(milliseconds: 700), 
+          duration: const Duration(milliseconds: 700), 
           curve: Curves.easeIn);
     });
   }
@@ -105,7 +96,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 color:Colors.amber[100],
               ),
               child: Center(
-                child: Container(
+                child: SizedBox(
                   width: 300,
                   height: 400,
                   child: Row(
@@ -123,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen> {
                               value: _progressValue,
                               backgroundColor:
                                   Theme.of(context).colorScheme.primary,
-                              valueColor: AlwaysStoppedAnimation(
+                              valueColor: const AlwaysStoppedAnimation(
                                   Color.fromARGB(255, 144, 213, 146)),
                             ),
                           )

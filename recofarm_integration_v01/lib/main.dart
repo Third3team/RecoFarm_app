@@ -5,10 +5,10 @@ import 'package:get/get.dart';
 import 'package:new_recofarm_app/firebase_options.dart';
 import 'package:new_recofarm_app/view/find_my_password.dart';
 import 'package:new_recofarm_app/view/interesting_area.dart';
+import 'package:new_recofarm_app/view/login_page.dart';
 import 'package:new_recofarm_app/view/my_area_list.dart';
 import 'package:new_recofarm_app/view/register_page.dart';
 import 'package:new_recofarm_app/view/splash_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'view/home.dart';
 
 /*
@@ -73,12 +73,12 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      home: SplashScreen(),
+      home: const SplashScreen(),
       getPages: [
         GetPage(
             // Login page 으로 이동
             name: '/login',
-            page: () => const Home(),
+            page: () => const LoginPage(),
             transition: Transition.circularReveal,
             transitionDuration: const Duration(seconds: 1)),
         GetPage(

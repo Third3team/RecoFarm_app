@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:new_recofarm_app/view/home_view_page.dart';
 import 'package:new_recofarm_app/vm/user_firebase.dart';
 import 'package:get/get.dart';
 
@@ -22,19 +23,23 @@ class edit extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController emailController =
-        TextEditingController(text: userEmail);
+    TextEditingController emailController = TextEditingController(text: userEmail);
     TextEditingController idController = TextEditingController(text: userId);
     TextEditingController pwController = TextEditingController(text: userPw);
-    TextEditingController nameController =
-        TextEditingController(text: userName);
-    TextEditingController nicknameController =
-        TextEditingController(text: userNickName);
-    TextEditingController phoneController =
-        TextEditingController(text: userPhone);
+    TextEditingController nameController = TextEditingController(text: userName);
+    TextEditingController nicknameController = TextEditingController(text: userNickName);
+    TextEditingController phoneController = TextEditingController(text: userPhone);
 
     return Scaffold(
-      appBar: AppBar(title: Text('회원정보 수정')),
+      appBar: AppBar(
+        title: const Text(
+          '회원정보 수정',
+          style: TextStyle(
+            fontSize: 35
+          ),
+        ),
+        backgroundColor: Colors.amber[100],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16.0),
@@ -99,9 +104,10 @@ class edit extends StatelessWidget {
                         phoneController.text,
                         nicknameController.text);
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('회원 정보가 업데이트되었습니다.')));
-                    await Future.delayed(Duration(seconds: 2));
-                    Get.back();
+                        SnackBar(content: Text('회원 정보가 업데이트되었습니다.'),
+                          duration: Duration(milliseconds: 700),
+                        ),);
+                    Get.off(HomeViewPage());
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('회원 정보 업데이트에 실패했습니다.')));

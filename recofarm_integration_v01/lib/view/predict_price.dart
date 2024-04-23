@@ -44,7 +44,13 @@ class _Predict_PriceState extends State<Predict_Price> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('예측 도매 가격 & 예측 수익'),
+        title: const Text(
+          '예측 도매 가격 & 예측 수익',
+          style: TextStyle(
+            fontSize: 35
+          ),
+        ),
+        backgroundColor: Colors.amber[100],
       ),
       body: Center(
         child: Column(

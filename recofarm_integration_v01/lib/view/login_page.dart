@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -20,9 +22,14 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
   TextEditingController userIdController = TextEditingController();
   TextEditingController userPwController = TextEditingController();
+  // 간편비밀번호 TextField
+  TextEditingController easyLoginUserPwController = TextEditingController();
+  
+  // 현재 어느 TabBar를 선택했는지에 대한 index
+  late int _currentTabBarIndex;
+
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  TextEditingController easyLoginUserPwController = TextEditingController();
 
   // 사용자 정보를 저장할 변수
   String? userEmail;
@@ -31,29 +38,10 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
+    _currentTabBarIndex = 0;
+    WidgetsBinding.instance.addObserver(this);
+    // Page가 Build 될 때, 회원가입을 통해 바로 로그인 시도를 하는지 확인.
     alreadyExistUserInfo();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    super.didChangeAppLifecycleState(state);
-    switch (state) {
-      case AppLifecycleState.detached:
-        break;
-      case AppLifecycleState.resumed:
-        final prefs = await SharedPreferences.getInstance();
-        prefs.clear();
-        break;
-      case AppLifecycleState.inactive:
-        final prefs = await SharedPreferences.getInstance();
-        prefs.clear();
-        break;
-      case AppLifecycleState.paused:
-        break;
-      default:
-        break;
-    }
   }
 
   @override
@@ -103,7 +91,8 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                     children: [
                       const SizedBox(
                         width: 300,
-                        child: TabBar(tabs: [
+                        child: TabBar(
+                          tabs: [
                           Tab(
                             child: Text(
                               '일반 로그인',
@@ -118,161 +107,143 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                           ),
                         ]),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
-                        child: SizedBox(
-                          width: 300,
-                          height: 150,
-                          child: TabBarView(
-                            children: [
-                              // 일반 로그인 Form
-                              Column(
+                      Builder(
+                        builder: (context) {
+                          // TabBar의 선택 Index를 확인하기 위해서, addListener를 추가.
+                          TabController tabController = DefaultTabController.of(context);
+                          tabController.addListener(() { _currentTabBarIndex = tabController.index;});
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+                            child: SizedBox(
+                              width: 300,
+                              height: 150,
+                              child: TabBarView(
+                                controller: tabController,
                                 children: [
-                                  Row(
+                                  // 일반 로그인 Form
+                                  Column(
                                     children: [
-                                      const Expanded(
-                                          flex: 1, child: Text("  아이디")),
-                                      Expanded(
-                                        flex: 3,
-                                        child: TextFormField(
-                                          style: const TextStyle(
-                                            fontSize: 25,
-                                          ),
-                                          decoration: const InputDecoration(
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                    vertical: 10.0,
-                                                    horizontal: 10.0),
-                                            isDense: true,
-                                            hintText: "아이디를 입력하세요.",
-                                            enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.grey),
+                                      Row(
+                                        children: [
+                                          const Expanded(
+                                              flex: 1, child: Text("  아이디")),
+                                          Expanded(
+                                            flex: 3,
+                                            child: TextFormField(
+                                              style: const TextStyle(
+                                                fontSize: 25,
+                                              ),
+                                              decoration: const InputDecoration(
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                        vertical: 10.0,
+                                                        horizontal: 10.0),
+                                                isDense: true,
+                                                hintText: "아이디를 입력하세요.",
+                                                enabledBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.grey),
+                                                ),
+                                                focusedBorder: OutlineInputBorder(
+                                                  borderSide:
+                                                      BorderSide(color: Colors.red),
+                                                ),
+                                              ),
+                                              keyboardType:
+                                                  TextInputType.emailAddress,
+                                              controller: userIdController,
                                             ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderSide:
-                                                  BorderSide(color: Colors.red),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        children: [
+                                          const Expanded(
+                                              flex: 1, child: Text("  비밀번호")),
+                                          Expanded(
+                                            flex: 3,
+                                            child: TextFormField(
+                                              style: const TextStyle(
+                                                fontSize: 25,
+                                              ),
+                                              decoration: const InputDecoration(
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                        vertical: 10.0,
+                                                        horizontal: 10.0),
+                                                isDense: true,
+                                                hintText: "비밀번호를 입력하세요.",
+                                                enabledBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.grey),
+                                                ),
+                                                focusedBorder: OutlineInputBorder(
+                                                  borderSide:
+                                                      BorderSide(color: Colors.red),
+                                                ),
+                                              ),
+                                              keyboardType:
+                                                  TextInputType.visiblePassword,
+                                              obscureText: true,
+                                              controller: userPwController,
                                             ),
                                           ),
-                                          keyboardType:
-                                              TextInputType.emailAddress,
-                                          controller: userIdController,
-                                        ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 10),
-                                  Row(
+                          
+                                  // 간편 로그인 Form
+                                  Column(
                                     children: [
-                                      const Expanded(
-                                          flex: 1, child: Text("  비밀번호")),
-                                      Expanded(
-                                        flex: 3,
-                                        child: TextFormField(
-                                          style: const TextStyle(
-                                            fontSize: 25,
-                                          ),
-                                          decoration: const InputDecoration(
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                    vertical: 10.0,
-                                                    horizontal: 10.0),
-                                            isDense: true,
-                                            hintText: "비밀번호를 입력하세요.",
-                                            enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.grey),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        children: [
+                                          const Text("간편비밀번호   "),
+                                          Expanded(
+                                            flex: 3,
+                                            child: TextFormField(
+                                              style: const TextStyle(
+                                                fontSize: 25,
+                                              ),
+                                              decoration: const InputDecoration(
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                        vertical: 10.0,
+                                                        horizontal: 10.0),
+                                                isDense: true,
+                                                hintText: "간편 비밀번호를 입력하세요.",
+                                                enabledBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.grey),
+                                                ),
+                                                focusedBorder: OutlineInputBorder(
+                                                  borderSide:
+                                                      BorderSide(color: Colors.red),
+                                                ),
+                                              ),
+                                              keyboardType: TextInputType.number,
+                                              obscureText: true,
+                                              controller: easyLoginUserPwController,
                                             ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderSide:
-                                                  BorderSide(color: Colors.red),
-                                            ),
                                           ),
-                                          keyboardType:
-                                              TextInputType.visiblePassword,
-                                          obscureText: true,
-                                          controller: userPwController,
-                                        ),
+                                        ],
                                       ),
                                     ],
                                   ),
                                 ],
                               ),
-
-                              // 간편 로그인 Form
-                              Column(
-                                children: [
-                                  // Row(
-                                  //   children: [
-                                  //     const Expanded(flex: 1, child: Text("  아이디")),
-                                  //     Expanded(
-                                  //       flex: 3,
-                                  //       child: TextFormField(
-                                  //         style: const TextStyle(
-                                  //           fontSize: 25,
-                                  //         ),
-                                  //         decoration: const InputDecoration(
-                                  //           contentPadding: EdgeInsets.symmetric(
-                                  //               vertical: 10.0, horizontal: 10.0),
-                                  //           isDense: true,
-                                  //           hintText: "아이디를 입력하세요.",
-                                  //           enabledBorder: OutlineInputBorder(
-                                  //             borderSide: BorderSide(color: Colors.grey),
-                                  //           ),
-                                  //           focusedBorder: OutlineInputBorder(
-                                  //             borderSide: BorderSide(color: Colors.red),
-                                  //           ),
-                                  //         ),
-                                  //         keyboardType: TextInputType.emailAddress,
-                                  //         controller: userIdController,
-                                  //       ),
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      const Text("간편비밀번호   "),
-                                      Expanded(
-                                        flex: 3,
-                                        child: TextFormField(
-                                          style: const TextStyle(
-                                            fontSize: 25,
-                                          ),
-                                          decoration: const InputDecoration(
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                    vertical: 10.0,
-                                                    horizontal: 10.0),
-                                            isDense: true,
-                                            hintText: "간편 비밀번호를 입력하세요.",
-                                            enabledBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.grey),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderSide:
-                                                  BorderSide(color: Colors.red),
-                                            ),
-                                          ),
-                                          keyboardType: TextInputType.number,
-                                          obscureText: true,
-                                          controller: easyLoginUserPwController,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                            ),
+                          );
+                        }
                       ),
                     ],
                   ),
-                )),
+                ),
+              ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -290,7 +261,7 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                     style: TextStyle(color: Color.fromARGB(255, 78, 101, 121)),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 ElevatedButton(
@@ -301,31 +272,32 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                     '로그인하기',
                   ),
                   onPressed: () async {
-                    setState(() {
-                      //showLoading = true;
-                    });
+                    // TabBar의 Index를 확인하여, 간편 비밀번호을 통한 로그인 시도로 판단한다.
+                    if(_currentTabBarIndex == 1) {
+                      SharedPreferences pref = await SharedPreferences.getInstance();
 
-                    if (easyLoginUserPwController.text.trim() != '') {
+                      // SQLite instance
                       DatabaseHandler dbHandler = DatabaseHandler();
-                      SharedPreferences pref =
-                          await SharedPreferences.getInstance();
-                      Map<String, Object?> response = await dbHandler.userLogin(
-                          pref.getString('userId').toString(),
-                          easyLoginUserPwController.text.trim());
+                      // SharedPreferences를 통해 가지고 있던 userId와, 입력받은 간편 비밀번호를 이용.
+                      // SQLite에서 유저 정보(userId, userPw)를 불러온다.
+                      Map<String, Object?> response = await dbHandler.userLogin(pref.getString('userId').toString(),easyLoginUserPwController.text.trim());
+                      // 정보가 존재하지 않으면 간편 로그인이 실패한 경우이다.
                       if (response['result'] == false) {
-                        print('간편 로그인 실패 ');
-                        // firebaseLoginAction(userId, userPw);
-                      } else {
-                        print('간편 로그인 성공 ');
-                        firebaseLoginAction(response['userId'].toString(),
-                            response['userPw'].toString());
-                      }
+                        print('간편 로그인 실패');
+                        // 조기 return을 통한 함수 종료.
+                        return;
+                      } 
+                      // 간편로그인을 통해 SQLite에서 가지고 있던 유저 정보(userId, userPw)를 이용하여 Firebase Login 시도
+                      firebaseLoginAction(response['userId'].toString(), response['userPw'].toString());
+                      // 조기 return을 통한 함수 종료. Firebase를 통한 로그인 성공
                       return;
                     }
 
+                    // 간편로그인이 아닌, 일반적인 로그인 경우
                     String userId = userIdController.text.trim();
                     String userPw = userPwController.text.trim();
 
+                    // ID 또는 PW를 입력하지 않았을 때,
                     if (userId.isEmpty || userPw.isEmpty) {
                       Fluttertoast.showToast(
                         msg: "아이디와 비밀번호를 입력해 주세요.",
@@ -334,13 +306,10 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                         backgroundColor: Colors.red,
                         fontSize: 16.0,
                       );
-                      setState(() {
-                        //showLoading = false;
-                      });
                       return;
                     }
-                    // my SQL 로그인
 
+                    // my SQL 로그인
                     // await mySQL_login(userId, userPw);
                     // Firebase에 이메일과 비밀번호로 로그인
                     //await signInWithEmailAndPassword(userId, userPw);
@@ -348,7 +317,7 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                     firebaseLoginAction(userId, userPw);
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 ElevatedButton(
@@ -357,8 +326,10 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                     Get.toNamed('/findPw');
                   },
                   style: ElevatedButton.styleFrom(
-                      shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)))),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15))
+                    )
+                  ),
                   child: const Text(
                     '비밀번호찾기',
                     style: TextStyle(color: Color.fromARGB(255, 65, 154, 9)),
@@ -366,17 +337,20 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                 ),
               ],
             ),
-            // SizedBox(height: 30,),
+            const SizedBox(height: 30,),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: Image.asset(
-                    "images/naver/btnW_.png",
-                    width: 100,
-                  ),
-                ),
+                // IconButton(
+                //   onPressed: () {},
+                //   icon: Image.asset(
+                //     "images/naver/btnW_.png",
+                //     width: 100,
+                //   ),
+
+                // ----------------------
+
+                // 구글 로그인 버튼
                 IconButton(
                   onPressed: () async {
                     await signInWithGoogle();
@@ -394,38 +368,36 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
     );
   }
 
-  mySQL_login(userId, UserPw) async {
-    print("user id : $userId");
-  }
-
+  // initState에서 실행되는 함수.
+  // ID와 PW의 값이 존재하면, 존재한 값을 통한 Firebase 로그인 시도
+  // 회원가입 완료 후 바로 로그인 시도할때 사용됨.
+  // 그 이외에 경우에는 사용되지 않는다.
   alreadyExistUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
 
-    String userId =
-        prefs.get('userId') != null ? prefs.get('userId').toString() : "";
-    String userPw =
-        prefs.get('userPw') != null ? prefs.get('userPw').toString() : "";
+    // key값을 통해 가져온 값이 null이여도, toString()을 통해 'null'이 되어버린다.
+    // null일 경우에 처리
+    String userId = prefs.get('userId') != null ? prefs.get('userId').toString() : "";
+    String userPw = prefs.get('userPw') != null ? prefs.get('userPw').toString() : "";
 
     print('ID: $userId');
     print('PW: $userPw');
+
+    // 두 값이 전부 존재할때,
     if (userId != "" && userPw != "") {
       firebaseLoginAction(userId, userPw);
     }
   }
 
+  // 로그인 종류에 상관없이 항상 Firebase를 통한 로그인 시도가 이루어짐.
   firebaseLoginAction(String userId, String userPw) async {
+    // Firebase ViewModel
     UserFirebase user = UserFirebase();
+    // 입력받은 userId와, userPw를 통해 Firebase에 값이 존재하는지 확인
     final response = await user.checkUser(userId, userPw);
 
-    if (response) {
-      print('로그인 완료!');
-
-      final prefs = await SharedPreferences.getInstance();
-      prefs.clear();
-      prefs.setString('userId', userId);
-      Get.to(HomeViewPage());
-    } else {
-      print('로그인 불가');
+    // Firebase에서 값을 제대로 불러오지 못했다면, 로그인 실패
+    if (!response) {
       Fluttertoast.showToast(
         msg: "아이디와 비밀번호를 확인해주세요.",
         toastLength: Toast.LENGTH_SHORT,
@@ -433,10 +405,26 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
         backgroundColor: Colors.red,
         fontSize: 16.0,
       );
-    }
+      return;
+    } 
+
+    print("-------- Firebase Login Success --------");
+
+    // Firebase에 값이 존재, 따라서 정상적인 로그인.
+    final prefs = await SharedPreferences.getInstance();
+
+    // 로그인 종류에 구애받지 않고 Firebase를 통한 Login 시도가 이루어지기에
+    // 저장되어있는 값을 전부 삭제 후 ID 정보만 유지 시킨다.
+    // ID 정보와 PW 정보가 존재하게 된다면, Login 시도 없이 접속 가능함. => 자동 로그인 기능임.
+    // 라디오 버튼 하나만 만들어 자동로그인을 허락한다면, prefs.clear() 부분에 조건 설정
+    prefs.clear();
+    prefs.setString('userId', userId);
+
+    // Login이 이루어지면 현재 존재하던 Page 전부를 없애고 이동.
+    Get.offAll(MainView());
   }
 
-  Future<UserCredential?> signInWithGoogle() async {
+  Future<void> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleSignInAccount =
           await _googleSignIn.signIn();
@@ -462,10 +450,9 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
         print("Google user: $user");
 
         // 페이지 이동
-        Get.to(HomeViewPage());
+        Get.offAll(MainView());
       }
     } catch (error) {
-      print(error);
       Fluttertoast.showToast(
         msg: "Google 로그인에 실패했습니다.",
         toastLength: Toast.LENGTH_SHORT,

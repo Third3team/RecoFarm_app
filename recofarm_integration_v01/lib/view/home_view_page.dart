@@ -1,11 +1,9 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:new_recofarm_app/model/user_area.dart';
-import 'package:new_recofarm_app/model/user_model.dart';
 import 'package:new_recofarm_app/view/detail_cabbageapi.dart';
 import 'package:new_recofarm_app/view/drawer_widget.dart';
 import 'package:new_recofarm_app/view/predict_price.dart';
@@ -21,17 +19,22 @@ import 'package:shared_preferences/shared_preferences.dart';
   Date        : 2024-04-17 13:32
   Author      : lcy
   Updates     : 
-  Detail      : - 
+    
+    2024-04-23 
+    나의 관심 농작지, openAPI를 통한 배추 도매 가격
+
+    Future 상태의 userId 값이 존재하는지를 확인 후 StreamBuilder를 통해
+    Firebase에서 불러온 값으로 사용자 정보를 구성함.
 
 */
 
+// ignore: must_be_immutable
 class HomeViewPage extends StatelessWidget {
   String? userId = '';
 
   initSharedPreferences() async {
     final pref = await SharedPreferences.getInstance();
-    userId =
-        pref.getString('userId') ?? FirebaseAuth.instance.currentUser?.email;
+    userId = pref.getString('userId') ?? FirebaseAuth.instance.currentUser?.email;
   }
 
   HomeViewPage({super.key});
@@ -50,7 +53,13 @@ class HomeViewPage extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           return Scaffold(
               appBar: AppBar(
-                title: const Text('Reco Farm'),
+                title: const Text(
+                  'Reco Farm',
+                  style: TextStyle(
+                    fontSize: 35
+                  ),
+                ),
+                backgroundColor: Colors.amber[100],
               ),
               drawer: DrawerWidget(userId: userId),
               body: SingleChildScrollView(
@@ -58,17 +67,16 @@ class HomeViewPage extends StatelessWidget {
                   stream: UserFirebase().selectUserEqaulID(userId!),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      final UserModel userModel = UserModel(
-                        name: snapshot.data!.docs.isNotEmpty
-                            ? snapshot.data!.docs[0]['userName']
-                            : FirebaseAuth.instance.currentUser?.displayName ??
-                                '',
-                        // phone: snapshot.data!.docs[0]['phone'],
-                        // nickName: snapshot.data!.docs[0]['nickname'],
-                        // userImagePath: snapshot.data!.docs[0]['image']
-                      );
                       // 불러온 데이터가 있을 때,
-
+                      // final UserModel userModel = UserModel(
+                      //   name: snapshot.data!.docs.isNotEmpty
+                      //       ? snapshot.data!.docs[0]['userName']
+                      //       : FirebaseAuth.instance.currentUser?.displayName ??
+                      //           '',
+                      //   // phone: snapshot.data!.docs[0]['phone'],
+                      //   // nickName: snapshot.data!.docs[0]['nickname'],
+                      //   // userImagePath: snapshot.data!.docs[0]['image']
+                      // );
                       return Center(
                         child: Column(
                           children: [
