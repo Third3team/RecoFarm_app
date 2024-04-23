@@ -26,3 +26,5 @@ TestResults.xml
 /Project/Data/GAP/.DS_Store
 recofarm_integration_v01/build
 recofarm_integration_v01/.dart_tool
+recofarm_integration_v01/.flutter-plugins
+recofarm_integration_v01/.flutter-plugins-dependencies
