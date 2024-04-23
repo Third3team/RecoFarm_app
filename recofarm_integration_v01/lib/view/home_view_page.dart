@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:new_recofarm_app/model/user_area.dart';
 import 'package:new_recofarm_app/view/detail_cabbageapi.dart';
 import 'package:new_recofarm_app/view/drawer_widget.dart';
+import 'package:new_recofarm_app/view/predict_price.dart';
 import 'package:new_recofarm_app/view/predict_yield.dart';
 import 'package:new_recofarm_app/vm/napacabbage_price_api.dart';
 import 'package:new_recofarm_app/vm/user_firebase.dart';
@@ -89,20 +90,28 @@ class HomeViewPage extends StatelessWidget {
                                         future: areaList,
                                         builder: (context, snapshot) {
                                           print(areaList);
-                                          if(snapshot.hasData && snapshot.data!.isNotEmpty) {
+                                          if (snapshot.hasData &&
+                                              snapshot.data!.isNotEmpty) {
                                             print('epdlxj');
-                                            List<UserArea> areas = snapshot.data!;
+                                            List<UserArea> areas =
+                                                snapshot.data!;
                                             return Swiper(
                                               itemBuilder: (context, index) {
                                                 // Swiper 배경색
                                                 Color? backgroundColor;
-                                                backgroundColor = index % 2 == 0 ? 
-                                                Theme.of(context).colorScheme.secondaryContainer : 
-                                                Theme.of(context).colorScheme.errorContainer;
+                                                backgroundColor = index % 2 == 0
+                                                    ? Theme.of(context)
+                                                        .colorScheme
+                                                        .secondaryContainer
+                                                    : Theme.of(context)
+                                                        .colorScheme
+                                                        .errorContainer;
                                                 return Container(
                                                   color: backgroundColor,
                                                   child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: [
                                                       Stack(
                                                         children: [
@@ -110,24 +119,28 @@ class HomeViewPage extends StatelessWidget {
                                                             width: 300,
                                                             height: 80,
                                                             child: Text(
-                                                              areas[index].area_address,
-                                                              style: const TextStyle(
+                                                              areas[index]
+                                                                  .area_address,
+                                                              style:
+                                                                  const TextStyle(
                                                                 fontSize: 45,
                                                               ),
-                                                              textAlign: TextAlign.center,
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
                                                             ),
                                                           ),
                                                           const Positioned(
-                                                            left: 190,
-                                                            top: -5,
-                                                            child: Text(
-                                                              '* 농작지 이름',
-                                                              style: TextStyle(
-                                                                fontSize: 20,
-                                                                color: Colors.red
-                                                              ),
-                                                            )
-                                                          )
+                                                              left: 190,
+                                                              top: -5,
+                                                              child: Text(
+                                                                '* 농작지 이름',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        20,
+                                                                    color: Colors
+                                                                        .red),
+                                                              ))
                                                         ],
                                                       ),
                                                       Stack(
@@ -137,23 +150,26 @@ class HomeViewPage extends StatelessWidget {
                                                             height: 80,
                                                             child: Text(
                                                               '${areas[index].area_size}',
-                                                              style: const TextStyle(
+                                                              style:
+                                                                  const TextStyle(
                                                                 fontSize: 45,
                                                               ),
-                                                              textAlign: TextAlign.center,
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
                                                             ),
                                                           ),
                                                           const Positioned(
-                                                            left: 190,
-                                                            top: -5,
-                                                            child: Text(
-                                                              '* 농작지 면적',
-                                                              style: TextStyle(
-                                                                fontSize: 20,
-                                                                color: Colors.red
-                                                              ),
-                                                            )
-                                                          )
+                                                              left: 190,
+                                                              top: -5,
+                                                              child: Text(
+                                                                '* 농작지 면적',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        20,
+                                                                    color: Colors
+                                                                        .red),
+                                                              ))
                                                         ],
                                                       ),
                                                       Stack(
@@ -162,24 +178,28 @@ class HomeViewPage extends StatelessWidget {
                                                             width: 300,
                                                             height: 80,
                                                             child: Text(
-                                                              areas[index].area_product,
-                                                              style: const TextStyle(
+                                                              areas[index]
+                                                                  .area_product,
+                                                              style:
+                                                                  const TextStyle(
                                                                 fontSize: 45,
                                                               ),
-                                                              textAlign: TextAlign.center,
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
                                                             ),
                                                           ),
                                                           const Positioned(
-                                                            left: 190,
-                                                            top: -5,
-                                                            child: Text(
-                                                              '* 농작지 작물',
-                                                              style: TextStyle(
-                                                                fontSize: 20,
-                                                                color: Colors.red
-                                                              ),
-                                                            )
-                                                          )
+                                                              left: 190,
+                                                              top: -5,
+                                                              child: Text(
+                                                                '* 농작지 작물',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        20,
+                                                                    color: Colors
+                                                                        .red),
+                                                              ))
                                                         ],
                                                       ),
                                                     ],
@@ -187,37 +207,44 @@ class HomeViewPage extends StatelessWidget {
                                                 );
                                               },
                                               itemCount: areas.length,
-                                              pagination: const SwiperPagination(),
-                                              );
-                                          }
-                                          else {
+                                              pagination:
+                                                  const SwiperPagination(),
+                                            );
+                                          } else {
                                             return Container(
                                               decoration: BoxDecoration(
-                                                color: Theme.of(context).colorScheme.secondaryContainer,
-                                                borderRadius: const BorderRadius.all(Radius.circular(10))
-                                              ),
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .secondaryContainer,
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(10))),
                                               child: Swiper(
                                                 itemCount: 1,
                                                 loop: false,
                                                 itemBuilder: (context, index) {
                                                   return Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: [
-                                                      const Text('아직 관심 농작지를 \n등록하지 않았습니다!'),
+                                                      const Text(
+                                                          '아직 관심 농작지를 \n등록하지 않았습니다!'),
                                                       Padding(
-                                                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-                                                        child: TextButton(
-                                                          onPressed: () {
-                                                            // Map으로 연결시켜 등록하게 한다.
-                                                          },
-                                                          child: const Text(
-                                                            '등록하기',
-                                                            style: TextStyle(
-                                                              color: Colors.blue
-                                                            ),
-                                                          )
-                                                        )
-                                                      )
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .fromLTRB(
+                                                                  0, 20, 0, 0),
+                                                          child: TextButton(
+                                                              onPressed: () {
+                                                                // Map으로 연결시켜 등록하게 한다.
+                                                              },
+                                                              child: const Text(
+                                                                '등록하기',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .blue),
+                                                              )))
                                                     ],
                                                   );
                                                 },
@@ -434,7 +461,7 @@ class HomeViewPage extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(0, 30, 0, 50),
                               child: GestureDetector(
-                                onTap: () => print('12312312'),
+                                onTap: () => Get.to(Predict_Price()),
                                 child: Container(
                                   color: Theme.of(context)
                                       .colorScheme
