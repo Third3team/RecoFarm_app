@@ -112,14 +112,14 @@ class HomeViewPage extends StatelessWidget {
                                                             child: Text(
                                                               areas[index].area_address,
                                                               style: const TextStyle(
-                                                                fontSize: 45,
+                                                                fontSize: 30,
                                                               ),
                                                               textAlign: TextAlign.center,
                                                             ),
                                                           ),
                                                           const Positioned(
                                                             left: 190,
-                                                            top: -5,
+                                                            top: -10,
                                                             child: Text(
                                                               '* 농작지 이름',
                                                               style: TextStyle(
@@ -138,7 +138,7 @@ class HomeViewPage extends StatelessWidget {
                                                             child: Text(
                                                               '${areas[index].area_size}',
                                                               style: const TextStyle(
-                                                                fontSize: 45,
+                                                                fontSize: 30,
                                                               ),
                                                               textAlign: TextAlign.center,
                                                             ),
@@ -164,7 +164,7 @@ class HomeViewPage extends StatelessWidget {
                                                             child: Text(
                                                               areas[index].area_product,
                                                               style: const TextStyle(
-                                                                fontSize: 45,
+                                                                fontSize: 30,
                                                               ),
                                                               textAlign: TextAlign.center,
                                                             ),
@@ -209,7 +209,7 @@ class HomeViewPage extends StatelessWidget {
                                                         child: TextButton(
                                                           onPressed: () {
                                                             // Map으로 연결시켜 등록하게 한다.
-                                                            Get.offNamed("/interestArea");
+                                                            Get.toNamed("/interestArea");
                                                           },
                                                           child: const Text(
                                                             '등록하기',
