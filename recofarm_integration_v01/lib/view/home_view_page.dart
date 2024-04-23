@@ -39,8 +39,7 @@ class HomeViewPage extends StatelessWidget {
     final NapaCabbageAPI cabbageController = Get.put(NapaCabbageAPI());
     cabbageController.fetchXmlData();
 
-    final Future<List<UserArea>> areaList = UserMySQL().getAreaData('lcy');
-    // final areaList = UserMySQL().areaList;
+    final Future<List<UserArea>> areaList = UserMySQL().getAreaData(userId);
 
     return FutureBuilder(
       future: initSharedPreferences(),
@@ -91,7 +90,9 @@ class HomeViewPage extends StatelessWidget {
                                       child: FutureBuilder(
                                         future: areaList,
                                         builder: (context, snapshot) {
-                                          if(snapshot.hasData) {
+                                          print(areaList);
+                                          if(snapshot.hasData && snapshot.data!.isNotEmpty) {
+                                            print('epdlxj');
                                             List<UserArea> areas = snapshot.data!;
                                             return Swiper(
                                               itemBuilder: (context, index) {
@@ -192,7 +193,38 @@ class HomeViewPage extends StatelessWidget {
                                               );
                                           }
                                           else {
-                                            return const Text('데이터 없음');
+                                            return Container(
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context).colorScheme.secondaryContainer,
+                                                borderRadius: const BorderRadius.all(Radius.circular(10))
+                                              ),
+                                              child: Swiper(
+                                                itemCount: 1,
+                                                loop: false,
+                                                itemBuilder: (context, index) {
+                                                  return Column(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      const Text('아직 관심 농작지를 \n등록하지 않았습니다!'),
+                                                      Padding(
+                                                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                                                        child: TextButton(
+                                                          onPressed: () {
+                                                            // Map으로 연결시켜 등록하게 한다.
+                                                          },
+                                                          child: const Text(
+                                                            '등록하기',
+                                                            style: TextStyle(
+                                                              color: Colors.blue
+                                                            ),
+                                                          )
+                                                        )
+                                                      )
+                                                    ],
+                                                  );
+                                                },
+                                              ),
+                                            );
                                           }
                                         },
                                       ),
