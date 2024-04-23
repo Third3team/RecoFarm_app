@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 /*
   Description :  내경작지 리스트 
@@ -32,29 +33,26 @@ class _MyAreaListState extends State<MyAreaList> {
   late int value;
   late String title;
   late String userId ;
+  // Sared preference instance 
+  late SharedPreferences prefs; 
+
 
   @override
   void initState() {
     super.initState();
+
+  // user 정보 shared preference 에서 받기
+  _getUserIdFromSharedPref();
+
     value = 0;
     title = "내 경작지 리스트";
-    userId = "pulpilisory";
+    //userId = "";
     data = [];
+
     get_myarea_JSONData(userId);
   }
-  // Json data fetching
-  get_myarea_JSONData(userId) async {
-    //String userId ;
-    String url_address ="http://localhost:8080/myarea?userId=$userId";
-    var url =Uri.parse(url_address); 
-    var response = await http.get(url);
-    print(response.body);
-    var dataConvertedJSON = json.decode(utf8.decode(response.bodyBytes));
-    List result = dataConvertedJSON;
-    data.addAll(result);
-    setState(() {});
-  }
 
+ 
   @override
   Widget build(BuildContext context) {
     return 
@@ -89,7 +87,7 @@ class _MyAreaListState extends State<MyAreaList> {
                             backgroundColor: Colors.red,
                             icon: Icons.delete,
                             label: "삭제",
-                            onPressed: (context) => selectDelete(index)
+                            onPressed: (context) => _selectDelete(index)
                             
                           ),
                           // SlidableAction(
@@ -125,8 +123,38 @@ class _MyAreaListState extends State<MyAreaList> {
             );
     
   }
+  
+  
   // --- Functions ---
-  selectDelete(index){
+  _getUserIdFromSharedPref() async{
+    // Desc : user Id 를 받아옴 . 
+    prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString('userId') ?? ""; // 기본값은 빈 문자열
+    print(" userID : $userId");
+  }
+
+
+   // MySQl data 가져오기 
+  get_myarea_JSONData(userId) async {
+    // Desc : 내관심 소재지 mySQL DB 에서 정보 가져오는 함수 
+    // Update : 2024.04.22 by pdg
+    //  - 더조은 학원 IP address  :  192.168.50.69
+    String ip_database  = "192.168.50.69";
+    String url_address ="http://$ip_database:8080/myarea?userId=$userId";
+    var url =Uri.parse(url_address); 
+    var response = await http.get(url);
+    //print(response.body);
+    var dataConvertedJSON = json.decode(utf8.decode(response.bodyBytes));
+    List result = dataConvertedJSON;
+    data.addAll(result);
+    setState(() {});
+  }
+
+  // 선택 관심지 삭제 함수 
+  _selectDelete(index){
+    // Function desc : 모달 팝업 으로 data 삭제 함수 
+    // Update : 2024.04.22 by pdg
+    
     showCupertinoModalPopup(
       barrierDismissible: false,
       
@@ -151,8 +179,11 @@ class _MyAreaListState extends State<MyAreaList> {
       ),
       );
   }
-  // function
+  
+  // rebuild 함수 
   _rebuildData(index,String str){
+    //Desc : data 재실행하여 화면 뿌려주기 
+    // Update : 2024.04.23 by pdg
     if(str.isNotEmpty){
       data[index]['title'] =str;
       setState((){});

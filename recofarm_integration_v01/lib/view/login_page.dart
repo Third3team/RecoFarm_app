@@ -288,6 +288,7 @@ void didChangeAppLifecycleState(AppLifecycleState state) async {
       prefs.clear();
       prefs.setString('userId', userId);
       
+      
       Get.offAll(MainView());
     }
     else {  
