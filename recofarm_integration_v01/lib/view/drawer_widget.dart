@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:get/get.dart';
 import 'package:new_recofarm_app/view/edit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:new_recofarm_app/view/login_page.dart';
 import 'package:new_recofarm_app/vm/user_firebase.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerWidget extends StatelessWidget {
   DrawerWidget({Key? key, required this.userId});
@@ -111,9 +114,21 @@ class DrawerWidget extends StatelessWidget {
                   color: Colors.black,
                 ),
                 title: Text('로그아웃'),
-                onTap: () => {print('home')},
-              ),
-            ],
+
+                onTap: () async {
+                  SharedPreferences preferences = await SharedPreferences.getInstance();
+                  preferences.clear();
+                  Fluttertoast.showToast(
+                    msg: "로그아웃 되었습니다.",
+                    toastLength: Toast.LENGTH_SHORT,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.red,
+                    fontSize: 20.0,
+                  );
+                  Get.offAll(const LoginPage());
+                },
+              )
+            ], // children
           );
         },
       ),
