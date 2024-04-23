@@ -95,8 +95,8 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   @override
   void initState() {
     super.initState();
-    
-    findMarker =null;
+
+    findMarker = null;
     // text field init
     myareaSizeTFcontroller = TextEditingController(text: "");
     myareaProductTFcontroller = TextEditingController(text: "");
@@ -145,7 +145,8 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     myareaData = [];
     // user Id fetching and myarea access
     _getUserIdFromSharedPref();
-    _getMyareaJSONData();
+
+    //_getMyareaJSONData();
 
     // 현재 지정된 위치(위도 경도)를 my sql Insert
     _curPosGenCalcDistance();
@@ -306,7 +307,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                   child: TextField(
                     controller: myareaSizeTFcontroller,
                     keyboardType: TextInputType.text,
-                    decoration: InputDecoration(labelText: "재배지 면적"),
+                    decoration: InputDecoration(labelText: "재배지 면적 (제곱미터)"),
                   ),
                 ),
                 Row(
@@ -314,9 +315,10 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        // DB insert code 
-                        _insertMyArea(interestLoc.latitude,interestLoc.longitude);
-                    myareaMarkerList.add(findMarker);
+                        // DB insert code
+                        _insertMyArea(
+                            interestLoc.latitude, interestLoc.longitude);
+                        myareaMarkerList.add(findMarker);
 
                         Get.back();
                       },
@@ -328,7 +330,6 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                       },
                       child: const Text("취소 "),
                     ),
-                  
                   ],
                 ),
               ],
@@ -345,7 +346,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     //  - 더조은 학원 IP address  :  192.168.50.69
     //
     //userId=pulpilisory&area_lat=37.108436612&area_lng=127.22501390&area_size=1200&area_product=배추&area_address=안성시 양선면 난실리
-    myareaProduct =myareaProductTFcontroller.text.trim().toString();
+    myareaProduct = myareaProductTFcontroller.text.trim().toString();
     String databaseIP = "192.168.50.69";
     String urlAreaInfo =
         "&area_lat=$curLat&area_lng=$curLng&area_size=$myAreaMeterSquare&area_product=$myareaProduct&area_address=$myareaAddress";
@@ -367,6 +368,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     prefs = await SharedPreferences.getInstance();
     userId = prefs.getString('userId') ?? ""; // 기본값은 빈 문자열
     //print(" userID : $userId");
+    _getMyareaJSONData();
   }
 
   // 2024.04.22 Udated bellow
@@ -380,6 +382,8 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     String url_address = "http://$ip_database:8080/myarea?userId=$userId";
     var url = Uri.parse(url_address);
     var response = await http.get(url);
+    //print("나의 경작지 정보 받아옴 : userId : $userId");
+    //print(url);
     //print(response.body);
     var dataConvertedJSON = json.decode(utf8.decode(response.bodyBytes));
     List result = dataConvertedJSON;
@@ -394,25 +398,56 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
       builder: (context) {
         return GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
-            child: CupertinoActionSheet(
-              title: const Text("내경작지 리스트"),
-              actions: List.generate(
+            child: GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: CupertinoActionSheet(
+                messageScrollController: ScrollController(),
+                message: SingleChildScrollView(
+                  controller: ScrollController(),
+                  child: Column(
+                    //children: [],
+                  ),
+                ),
+                title: const Text("내 경작지 리스트"),
+                actions: List.generate(
                   myareaData.length,
                   (index) => CupertinoActionSheetAction(
-                        onPressed: () {
-                          print("clicked");
-                        },
-                        child: Text(
-                          '''${index + 1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})''',
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      )),
+                    onPressed: () {
+                      print("clicked");
+                      // 해당 위치로 이동하기 
+                      _gotoSelectedLoc(index);
+                      Get.back();
+                    },
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '''${index + 1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})''',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ));
 
         //MyAreaList();
       },
       barrierDismissible: true,
     );
+  }
+  _gotoSelectedLoc(index){
+    // Desc : 내 경작지 리스트에서 클릭한 항목에 대한 주소로 구글맵 이동 
+    // Update : 2024.04.23 by pdg
+    print("${myareaData[index]['area_address']}(${myareaData[index]['area_product']})");
+     mapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(myareaData[index]['area_lat'],myareaData[index]['area_lng']),
+          zoom: 14.4746,
+        ),
+      ),
+    );
+
   }
 
   _addMyAreaDialog() {
@@ -452,11 +487,11 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     // result
     searchedAddress = address_result[0]['formatted_address'];
 
-    // interstLco 에 현재 위치 위도 경도 넣기 
+    // interstLco 에 현재 위치 위도 경도 넣기
     interestLoc = LatLng(address_result[0]['geometry']['location']['lat'],
         address_result[0]['geometry']['location']['lng']);
 
-    // map 이동 
+    // map 이동
     mapController.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(
@@ -471,15 +506,14 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
       markerId: MarkerId(searchedAddress),
       position: interestLoc,
     );
-    // markers 에 추가 
-    
+    // markers 에 추가
+
     markers.add(findMarker);
     // 거리계산
     _curPosGenCalcDistance();
-    // 내 위치 에 해당 위치 변수 넣어주기 
+    // 내 위치 에 해당 위치 변수 넣어주기
     myareaAddress = searchedAddress;
     setState(() {});
-    
   }
 
   // 내가 입력한 주소의 위도경도를 아웃풋.
@@ -526,6 +560,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     );
 
     print(" >> 현재위치 주소 : $searchedAddress");
+
     setState(() {});
     // return LatLng(curPosition.latitude, curPosition.longitude);
   }
