@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+	Description : 내 소재지 Dao mapper 
+	Detail 		: 
+	Date		: 2024.04.21
+	Author 		: Forrest D Park. (pdg)
+	
+	Update 		:
+		2024.04.21 by pdg
+			- select users 로 조회
+			- insert users 기능 추가 
+ -->
+<mapper namespace="com.springlec.base.dao.myareaDao">
+  <!-- *** myarea List Dao ***-->
+  <select id="myareaListDao" resultType="com.springlec.base.model.myareaDto">
+    SELECT * FROM myarea WHERE userId = #{userId}
+  </select>
+  
+  <select id="myareaOneDao" >
+    SELECT area_product FROM myarea WHERE userId = #{userId}
+  </select>
+  
+  
+  <!-- *** Insert signed up users to table  -->
+  <insert id="myareaInsertDao">
+  	INSERT INTO 
+  	myarea ( userId, area_lat, area_lng, area_size, area_product, area_address) 
+	VALUES (#{userId}, #{area_lat}, #{area_lng}, #{area_size}, #{area_product}, #{area_address})
+	
+  </insert>
+  
+  
+
+
+
+</mapper>
