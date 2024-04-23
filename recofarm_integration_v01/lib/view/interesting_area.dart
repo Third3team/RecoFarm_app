@@ -4,12 +4,14 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 // import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:new_recofarm_app/view/my_area_list.dart';
+import 'package:new_recofarm_app/view/myarea_edit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -406,24 +408,83 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                 message: SingleChildScrollView(
                   controller: ScrollController(),
                   child: Column(
-                    //children: [],
-                  ),
+                      //children: [],
+                      ),
                 ),
                 title: const Text("내 경작지 리스트"),
                 actions: List.generate(
                   myareaData.length,
-                  (index) => CupertinoActionSheetAction(
-                    onPressed: () {
-                      print("clicked");
-                      // 해당 위치로 이동하기 
-                      _gotoSelectedLoc(index);
-                      Get.back();
-                    },
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        '''${index + 1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})''',
-                        style: TextStyle(fontSize: 15),
+                  (index) => Slidable(
+                    startActionPane: ActionPane(
+
+                          motion: const BehindMotion(),
+                          children: [
+                            SlidableAction(
+                              spacing: 1,
+                              backgroundColor: const Color.fromARGB(255, 75, 152, 214),
+                              icon: Icons.edit,
+                              label: "수정",
+                              onPressed: (context) {
+                                Get.defaultDialog(
+                                  
+                                  content:MyAreaEdit(
+                                    myareaSize: myareaData[index]['area_size'],
+                                    myareaProduct: myareaData[index]['area_product']
+                                  ) ,
+                                );
+                                print("수정 슬라이드 ");
+                              },
+                            )
+                          ],
+                        ),
+                        endActionPane: ActionPane(
+                          motion: StretchMotion(),
+                          children: [
+                            SlidableAction(
+                              onPressed: (context) {
+                              
+                              },
+                              backgroundColor: const Color.fromARGB(255, 211, 94, 86),
+                              icon: Icons.edit,
+                              label: "삭제",
+                              )
+                          ],
+                        ),
+
+                    child: CupertinoActionSheetAction(
+                      onPressed: () {
+                        print("clicked");
+                        // 해당 위치로 이동하기
+                        _gotoSelectedLoc(index);
+                        Get.back();
+                      },
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${index + 1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})'
+                                          .length >
+                                      20
+                                  ? '${index + 1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})'
+                                          .substring(0, 20) +
+                                      "..."
+                                  : '${index + 1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})',
+                              style: TextStyle(fontSize: 15),
+                            ),
+                            SizedBox(
+                              width: 50,
+                              child: ElevatedButton(
+                                onPressed: () {},
+                                child: const Text(
+                                  "예측",
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -436,19 +497,21 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
       barrierDismissible: true,
     );
   }
-  _gotoSelectedLoc(index){
-    // Desc : 내 경작지 리스트에서 클릭한 항목에 대한 주소로 구글맵 이동 
+
+  _gotoSelectedLoc(index) {
+    // Desc : 내 경작지 리스트에서 클릭한 항목에 대한 주소로 구글맵 이동
     // Update : 2024.04.23 by pdg
-    print("${myareaData[index]['area_address']}(${myareaData[index]['area_product']})");
-     mapController.animateCamera(
+    print(
+        "${myareaData[index]['area_address']}(${myareaData[index]['area_product']})");
+    mapController.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(
-          target: LatLng(myareaData[index]['area_lat'],myareaData[index]['area_lng']),
+          target: LatLng(
+              myareaData[index]['area_lat'], myareaData[index]['area_lng']),
           zoom: 14.4746,
         ),
       ),
     );
-
   }
 
   _addMyAreaDialog() {

@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.catalina.connector.Response;
 import org.apache.jasper.tagplugins.jstl.core.Out;
+import org.rosuda.REngine.Rserve.RConnection;
+//import org.rosuda.REngine.Rserve.RConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,6 +36,7 @@ import com.springlec.base.service.usersDaoService;
  * 	2024.04.21 by pdg
  * 		- 내 농작지 조회 기능 api json 으로 출력하는 기능 추가  
  * 		- insert 기능 추가 
+ *  2024.04.22 by pdg
 */
 
 @Controller
@@ -47,6 +50,45 @@ public class myareaController {
 //		return "test";
 //		
 //	}
+	
+	@GetMapping("/predict")
+	public ResponseEntity<String> signup(
+			HttpServletRequest request
+			) throws Exception {
+			System.out.println(" Rserve 연결 ");
+		 double areaSize = Double.parseDouble(request.getParameter("areaSize"));
+		    double lat = Double.parseDouble(request.getParameter("lat"));
+		    double lng = Double.parseDouble(request.getParameter("lng"));
+		 
+		    RConnection conn = new RConnection();
+//		    conn.voidEval("library(Rserve)");
+//		    conn.voidEval("Rserve(FALSE, port=6311, args = '--RS-encoding utf8 --no-save')");
+		    
+		    
+		    
+		    conn.voidEval("library(randomForest)");
+
+		    conn.voidEval("data <- read.csv('/Library/Tomcat/webapps/ROOT/Flutter/Project_Rserve/predict_weather.csv')");
+		    conn.voidEval("data <- data[data$lat == " + lat +",][1,]");
+
+		    conn.voidEval("rf <- readRDS('/Library/Tomcat/webapps/ROOT/Flutter/Project_Rserve/rf_recoFarm_product_model_ver1.rds')");
+		    
+		    String script = "result <- (predict(rf, list(" +
+		                    "areaSize=" + areaSize + ", " +
+		                    "lat=" + lat + ", " +
+		                    "lng=" + lng + ", " +
+		                    "humidity=data$humidity, " +
+		                    "soilMoisture=data$soilMoisture, " +
+		                    "temperature=data$temperature," +
+		                    "surfaceTemperature=data$surfaceTemperature)))";
+		    
+		    conn.voidEval(script);
+
+		    String test = conn.eval("exp(result)").asString();
+
+		    
+		return ResponseEntity.ok(test);
+	}
 	@GetMapping("/myarea")
 	public ResponseEntity<String> signup(
 			HttpServletRequest request,

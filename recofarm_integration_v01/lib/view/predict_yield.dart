@@ -250,9 +250,9 @@ class PredictYield extends StatelessWidget {
       areaSize = areaSize * 3.3;
     }
 
-    var url = Uri.parse('http://localhost:8080/Flutter/Project_Rserve/predict.jsp?areaSize=${areaSize}&lat=${vmPredictController.latData}&lng=${vmPredictController.lngData}');
+    var url = Uri.parse('http://localhost:8080/predict?areaSize=${areaSize}&lat=${vmPredictController.latData}&lng=${vmPredictController.lngData}');
     var response = await http.readBytes(url);
-    double result = json.decode(utf8.decode(response))['result'];
+    double result = json.decode(utf8.decode(response));
 
     Get.defaultDialog(
       title: '결과',

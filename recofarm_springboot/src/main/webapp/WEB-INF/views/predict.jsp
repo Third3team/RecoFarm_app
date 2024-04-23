@@ -11,26 +11,27 @@
     RConnection conn = new RConnection();
     
     
-    conn.voidEval("data <- read.csv('/Library/Tomcat/webapps/ROOT/Flutter/Project_Rserve/predict_weather.csv')");
     conn.voidEval("library(randomForest)");
-    conn.voidEval("rf <- readRDS('/Library/Tomcat/webapps/ROOT/Flutter/Project_Rserve/rf_recoFarm_product_model.rds')");
+
+    conn.voidEval("data <- read.csv('/Library/Tomcat/webapps/ROOT/Flutter/Project_Rserve/predict_weather.csv')");
+    conn.voidEval("data <- data[data$lat == " + lat +",][1,]");
+
+    conn.voidEval("rf <- readRDS('/Library/Tomcat/webapps/ROOT/Flutter/Project_Rserve/rf_recoFarm_product_model_ver1.rds')");
     
-    conn.voidEval("data$humidity")
-    conn.voidEval(
-        "result <- as.character(
-            predict(rf, 
-                (list(
-                    재배면적.제곱미터.="+ areaSize +", 
-                    위도="+ lat +", 
-                    경도="+ lng +", 
-                    평균습도=data$humidity,
-                    토양수분=data$soilMoisture, 
-                    평균기온=data$temperature, 
-                    평균지면온도=data$surfaceTemperature
-                ))))"
-    );
+    String script = "result <- (predict(rf, list(" +
+                    "areaSize=" + areaSize + ", " +
+                    "lat=" + lat + ", " +
+                    "lng=" + lng + ", " +
+                    "humidity=data$humidity, " +
+                    "soilMoisture=data$soilMoisture, " +
+                    "temperature=data$temperature," +
+                    "surfaceTemperature=data$surfaceTemperature)))";
+    
+    conn.voidEval(script);
 
-    String result = conn.eval("result").asString();
+    String test = conn.eval("exp(result)").asString();
 %>
+    {"result" : <%= test %>}
+<%
 
-    {"result" : "<%=result%>"} 
+%>
