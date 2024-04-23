@@ -10,6 +10,7 @@ import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:new_recofarm_app/view/my_area_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 /*
@@ -36,6 +37,8 @@ import 'package:syncfusion_flutter_charts/charts.dart';
         - 내 관심 농작지 List view 로 보여주는 기능 필요 ?
         - 내 관심 농작지 페이지 list view 로 보여주는 페이지 를 제작 <- db 조회 필요..
         - sql db 에서 가져와서 listview 로 플랏 해주고 
+      2024.04.23 by pdg
+        - shared pref 설정 세팅 및 함수 정리 
   Detail      : - 
 
 */
@@ -49,6 +52,7 @@ class InterestingAreaPage extends StatefulWidget {
 class _InterestingAreaPageState extends State<InterestingAreaPage> {
   // properties
   late TextEditingController locationTfController;
+  // Geometric properties
   late LatLng interestLoc;
   late bool islocationEnable;
   late Marker myloc1;
@@ -59,18 +63,25 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   late String searchedAddress;
   // google map 컨트롤러!!
   late GoogleMapController mapController;
-
   // markers
   late List markers;
-
   // myarea
   late List myareaData;
+
+  // update 2024.04.23 below
+  // shared pref instance init
+  late SharedPreferences prefs; 
+  // User info
+  late String userId;
+
+  // Init STATE-------------------------------
   @override
   void initState() {
     super.initState();
     locationTfController = TextEditingController(text: "");
     interestLoc = const LatLng(36.595086846, 128.9351767475763);
     //print(interestLoc);
+
     // 경작지 위치  마커
     myloc1 = Marker(
       markerId: const MarkerId("경작지1"),
@@ -80,10 +91,11 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
         snippet: "배추밭, 10000제곱 미터",
       ),
     );
+    // 마커 리스트 
     markers = [myloc1];
     myAreaMeterSquare = 10000; // 100 m^2 -> 3.14 * r^2 =100 ->
     myAreaRadius = sqrt(myAreaMeterSquare / 3.14);
-    // 경작지 반경
+    // 경작지 반경 계산 
     myAreaCircle = Circle(
       circleId: CircleId('myloc1'),
       center: interestLoc,
@@ -97,13 +109,16 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     distance1 = 0;
     getPlaceAddress(interestLoc.latitude, interestLoc.longitude);
 
-    //
+    // 농작할 소재지 검색 
     searchedAddress = "";
     getPlaceAddress(interestLoc.latitude, interestLoc.longitude);
     //searchPlace();
-    //
+    
+    // 내 경작지 데이터 
     myareaData = [];
-    get_myarea_JSONData("pulpilisory");
+    // user Id fetching and myarea access
+    _getUserIdFromSharedPref();
+    _getMyareaJSONData();
   }
 
 
@@ -233,17 +248,28 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   }
 
   // Function
+  // 2024.04.23 updated 
+  _getUserIdFromSharedPref() async{
+    // Desc : user Id 를 받아옴 . 
+    prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString('userId') ?? ""; // 기본값은 빈 문자열
+    print(" userID : $userId");
+  }
+
   // 2024.04.22 추가한 함수
 
   // 관심 농지 추가 버튼 클릭후 예 눌렀을 때 insert api
 
   // 내 소재지 정보 불러오는 함수 .
-  get_myarea_JSONData(userId) async {
-    //String userId ;
-    String url_address = "http://localhost:8080/myarea?userId=$userId";
+  _getMyareaJSONData() async {
+    // Desc : 내관심 소재지 mySQL DB 에서 정보 가져오는 함수 
+    // Update : 2024.04.22 by pdg
+    //  - 더조은 학원 IP address  :  192.168.50.69    String url_address = "http://localhost:8080/myarea?userId=$userId";
+    String ip_database  = "192.168.50.69";
+    String url_address ="http://$ip_database:8080/myarea?userId=$userId";
     var url = Uri.parse(url_address);
     var response = await http.get(url);
-    print(response.body);
+    //print(response.body);
     var dataConvertedJSON = json.decode(utf8.decode(response.bodyBytes));
     List result = dataConvertedJSON;
     myareaData.addAll(result);

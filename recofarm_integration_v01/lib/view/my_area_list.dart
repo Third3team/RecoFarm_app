@@ -127,10 +127,10 @@ class _MyAreaListState extends State<MyAreaList> {
   
   // --- Functions ---
   _getUserIdFromSharedPref() async{
+    // Desc : user Id 를 받아옴 . 
     prefs = await SharedPreferences.getInstance();
     userId = prefs.getString('userId') ?? ""; // 기본값은 빈 문자열
-
-
+    print(" userID : $userId");
   }
 
 
