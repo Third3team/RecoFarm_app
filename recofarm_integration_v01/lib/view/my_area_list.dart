@@ -11,12 +11,16 @@ import 'package:http/http.dart' as http;
   Author      : Forrest DongGeun Park. (PDG)
   Updates     : 
 	  2024.04.22 Mon by pdg
-		  - 내경 작지를 Json 으로 받아오는것 실험 .
+		  - 내경작지를 Json 으로 받아오는것 실험 .
   Detail      : - 
 
 */
 class MyAreaList extends StatefulWidget {
-  const MyAreaList({super.key});
+  //final GestureTapCallback getBackPress;
+  const MyAreaList({
+    super.key,
+    //required this.getBackPress
+    });
 
   @override
   State<MyAreaList> createState() => _MyAreaListState();
@@ -25,110 +29,101 @@ class MyAreaList extends StatefulWidget {
 class _MyAreaListState extends State<MyAreaList> {
   //properties
   late List data;
-
   late int value;
   late String title;
+  late String userId ;
 
   @override
   void initState() {
     super.initState();
     value = 0;
-    title = "Slidable ";
+    title = "내 경작지 리스트";
+    userId = "pulpilisory";
     data = [];
-    getJSONData();
+    get_myarea_JSONData(userId);
   }
-
-  getJSONData() async {
-    var url =
-        Uri.parse('https://zeushahn.github.io/Test/movies.json'); //restful API
+  // Json data fetching
+  get_myarea_JSONData(userId) async {
+    //String userId ;
+    String url_address ="http://localhost:8080/myarea?userId=$userId";
+    var url =Uri.parse(url_address); 
     var response = await http.get(url);
+    print(response.body);
     var dataConvertedJSON = json.decode(utf8.decode(response.bodyBytes));
-    List result = dataConvertedJSON['results'];
+    List result = dataConvertedJSON;
     data.addAll(result);
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: Center(
+    return 
+       Center(
         child: data.isEmpty
             ? const CircularProgressIndicator()
-            : ListView.builder(
-                itemCount: data.length,
-                itemBuilder: (context, index) {
-                  return Slidable(
-                    startActionPane:
-                        ActionPane(motion: const BehindMotion(), children: [
-                      SlidableAction(
-                        backgroundColor: Colors.blueAccent,
-                        icon: Icons.edit,
-                        label: "Edit",
-                        onPressed: (context) {
-                          //
-                          // Get.to(
-                          //   const Edit(),
-                          //   arguments: [
-                          //     data[index]['image'],data[index]['title']
-                          //   ]
-                          //   )!.then((value) => _rebuildData(index,value)); // value = result
-                        },
-                      ),
-                    ]),
-                    endActionPane:
-                        ActionPane(motion: StretchMotion(), children: [
-                      SlidableAction(
-                        backgroundColor: Colors.red,
-                        icon: Icons.delete,
-                        label: "삭제",
-                        onPressed: (context) => selectDelete(index)
-                        
-                      ),
-                      // SlidableAction(
-                      //   backgroundColor: Colors.red,
-                      //   icon: Icons.delete,
-                      //   label: "삭제",
-                      //   onPressed: (context) {
-                      //     //
-                      //   },
-                      // )
-                    ]),
-                    child: Card(
-                      color: index % 2 == 0
-                          ? Theme.of(context).colorScheme.secondaryContainer
-                          : Theme.of(context).colorScheme.tertiaryContainer,
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ClipRRect(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                              child: Image.network(
-                                data[index]['image'],
-                                width: 80,
-                              ),
-                            ),
+            : 
+                ListView.builder(
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      return Slidable(
+                        startActionPane:
+                            ActionPane(motion: const BehindMotion(), children: [
+                          SlidableAction(
+                            backgroundColor: Colors.blueAccent,
+                            icon: Icons.edit,
+                            label: "Edit",
+                            onPressed: (context) {
+                              //
+                              // Get.to(
+                              //   const Edit(),
+                              //   arguments: [
+                              //     data[index]['image'],data[index]['title']
+                              //   ]
+                              //   )!.then((value) => _rebuildData(index,value)); // value = result
+                            },
                           ),
-                          Text(
-                            "     ${data[index]['title']}",
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSecondaryContainer,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15),
-                          )
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-      ),
-    );
+                        ]),
+                        endActionPane:
+                            ActionPane(motion: StretchMotion(), children: [
+                          SlidableAction(
+                            backgroundColor: Colors.red,
+                            icon: Icons.delete,
+                            label: "삭제",
+                            onPressed: (context) => selectDelete(index)
+                            
+                          ),
+                          // SlidableAction(
+                          //   backgroundColor: Colors.red,
+                          //   icon: Icons.delete,
+                          //   label: "삭제",
+                          //   onPressed: (context) {
+                          //     //
+                          //   },
+                          // )
+                        ]),
+                        child: Card(
+                          color: index % 2 == 0
+                              ? Theme.of(context).colorScheme.secondaryContainer
+                              : Theme.of(context).colorScheme.tertiaryContainer,
+                          child: Row(
+                            children: [
+                
+                              Text(
+                                " ${index+1}.  ${data[index]['area_address']}(${data[index]['area_product']})",
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondaryContainer,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 30),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+            );
+    
   }
   // --- Functions ---
   selectDelete(index){

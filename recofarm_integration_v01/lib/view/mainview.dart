@@ -50,8 +50,9 @@ class _MainViewState extends State<MainView> with SingleTickerProviderStateMixin
         controller: tController,
         children: [
           HomeViewPage(),
-          LoginPage(),
-          // InterestingAreaPage(),
+
+          InterestingAreaPage()
+
         ]
       ),
       bottomNavigationBar: Container(
