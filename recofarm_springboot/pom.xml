@@ -22,9 +22,23 @@
 		* Author : pdg
 		* Update : 	
 			1. Recofarm Web spring API  를 위한 porm 설
+		
 	
 	-->
+	
+	
+	
 	<dependencies>
+		<dependency>
+		    <groupId>org.rosuda.REngine</groupId>
+		    <artifactId>REngine</artifactId>
+		    <version>2.1.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.rosuda.REngine</groupId>
+		    <artifactId>Rserve</artifactId>
+		    <version>1.8.1</version>
+		</dependency>
 		<!--  mySQL JDBC dependency -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
