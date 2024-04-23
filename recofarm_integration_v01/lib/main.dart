@@ -7,6 +7,7 @@ import 'package:new_recofarm_app/view/find_my_password.dart';
 import 'package:new_recofarm_app/view/my_area_list.dart';
 import 'package:new_recofarm_app/view/register_page.dart';
 import 'package:new_recofarm_app/view/splash_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'view/home.dart';
 
 /*
@@ -31,8 +32,11 @@ void main() async {
 
   // Fire base init
   await Firebase.initializeApp(
+
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // SharedPreferences preferences = await SharedPreferences.getInstance();
+  // await preferences.clear();
   runApp(const MyApp());
 }
 
