@@ -22,6 +22,9 @@ import 'home.dart';
         - 사용자가 로그인을 하지 않았거나 처음 사용한다면 로그인 페이지로 간다. 
       2024.04.22 By pdg 
         - 스플레시 끝나고 메인들어갈때 뒤에 남지 않게  할 것 . 
+      2024.04.22 by lcy
+        - get offnamed 하면 setState 때문에 에러발생 
+          -> loading effect 에서 if(mount ) 추가하여 에러 해결 
 
 */
 
