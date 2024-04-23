@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:new_recofarm_app/view/edit.dart';
@@ -11,6 +12,8 @@ class DrawerWidget extends StatelessWidget {
   DrawerWidget({Key? key, required this.userId});
 
   final userId;
+  String? userName;
+  String? userEmail;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +26,17 @@ class DrawerWidget extends StatelessWidget {
               child: Text('데이터가 없습니다.'),
             );
           }
+
+          if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+            userName = snapshot.data!.docs[0]['userName'] ??
+                FirebaseAuth.instance.currentUser?.displayName;
+            userEmail = snapshot.data!.docs[0]['userEmail'] ??
+                FirebaseAuth.instance.currentUser?.email;
+          } else {
+            // 데이터가 없을 경우의 기본값 설정
+            userName = FirebaseAuth.instance.currentUser?.displayName;
+            userEmail = FirebaseAuth.instance.currentUser?.email;
+          }
           return ListView(
             padding: EdgeInsets.zero,
             children: [
@@ -33,7 +47,7 @@ class DrawerWidget extends StatelessWidget {
                 accountName: Padding(
                   padding: const EdgeInsets.fromLTRB(6, 30, 0, 0),
                   child: Text(
-                    '${snapshot.data!.docs[0]['userName']}님',
+                    '${userName ?? '사용자 이름'}님',
                     style: TextStyle(
                       fontSize: 20,
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
@@ -43,7 +57,7 @@ class DrawerWidget extends StatelessWidget {
                 accountEmail: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                   child: Text(
-                    '${snapshot.data!.docs[0]['userNickName']}',
+                    userEmail ?? '사용자 이름',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                     ),
@@ -89,25 +103,26 @@ class DrawerWidget extends StatelessWidget {
                 title: Text('공지사항'),
                 onTap: () => {print('home')},
               ),
-              ListTile(
-                leading: const Icon(
-                  Icons.edit,
-                  color: Colors.red,
+              if (snapshot.hasData && snapshot.data!.docs.isNotEmpty)
+                ListTile(
+                  leading: const Icon(
+                    Icons.edit,
+                    color: Colors.red,
+                  ),
+                  title: const Text('회원정보 수정'),
+                  onTap: () {
+                    Get.to(
+                      edit(
+                        userId: snapshot.data!.docs[0]['userId'],
+                        userEmail: snapshot.data!.docs[0]['userEmail'],
+                        userPw: snapshot.data!.docs[0]['userPw'],
+                        userName: snapshot.data!.docs[0]['userName'],
+                        userNickName: snapshot.data!.docs[0]['userNickName'],
+                        userPhone: snapshot.data!.docs[0]['userPhone'],
+                      ),
+                    );
+                  },
                 ),
-                title: const Text('회원정보 수정'),
-                onTap: () {
-                  Get.to(
-                    edit(
-                      userId: snapshot.data!.docs[0]['userId'],
-                      userEmail: snapshot.data!.docs[0]['userEmail'],
-                      userPw: snapshot.data!.docs[0]['userPw'],
-                      userName: snapshot.data!.docs[0]['userName'],
-                      userNickName: snapshot.data!.docs[0]['userNickName'],
-                      userPhone: snapshot.data!.docs[0]['userPhone'],
-                    ),
-                  );
-                },
-              ),
               ListTile(
                 leading: const Icon(
                   Icons.exit_to_app,
