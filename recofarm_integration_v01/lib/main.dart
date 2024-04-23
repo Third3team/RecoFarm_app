@@ -26,7 +26,7 @@ import 'view/home.dart';
 */
 
 void main() async {
-  //플러터 프레임 워크가 앱을 실행할 준비가 될때 까지 기다림 
+  //플러터 프레임 워크가 앱을 실행할 준비가 될때 까지 기다림
   WidgetsFlutterBinding.ensureInitialized();
 
   // Fire base init
@@ -58,18 +58,10 @@ class MyApp extends StatelessWidget {
         // UI font family 설정  => Dongle
         fontFamily: 'Dongle',
         textTheme: const TextTheme(
-          labelLarge: TextStyle(
-            fontSize: 30
-          ),
-          bodyLarge: TextStyle(
-            fontSize: 30
-          ),
-          bodySmall: TextStyle(
-            fontSize: 30
-          ),
-          bodyMedium: TextStyle(
-            fontSize: 30
-          ),
+          labelLarge: TextStyle(fontSize: 30),
+          bodyLarge: TextStyle(fontSize: 30),
+          bodySmall: TextStyle(fontSize: 30),
+          bodyMedium: TextStyle(fontSize: 30),
         ),
         colorScheme: ColorScheme.fromSeed(
             seedColor: const Color.fromARGB(255, 233, 172, 30)),
@@ -78,45 +70,37 @@ class MyApp extends StatelessWidget {
 
       home: SplashScreen(),
       getPages: [
-
         GetPage(
-          // Login page 으로 이동
-          name: '/login',
-          page: () => const Home(),
-          transition: Transition.circularReveal,
-          transitionDuration: const Duration(seconds :1)
-        ),
+            // Login page 으로 이동
+            name: '/login',
+            page: () => const Home(),
+            transition: Transition.circularReveal,
+            transitionDuration: const Duration(seconds: 1)),
         GetPage(
-          // home 으로 이동
-          name: '/home',
-          page: () => const Home(),
-          transition: Transition.circularReveal,
-          transitionDuration: const Duration(seconds :1)
-        ),
+            // home 으로 이동
+            name: '/home',
+            page: () => const Home(),
+            transition: Transition.circularReveal,
+            transitionDuration: const Duration(seconds: 1)),
         GetPage(
-          //회원 가입 페이지 이동
-          name: '/register',
-          page: () => const RegisterPage(),
-          transition: Transition.fadeIn,
-          transitionDuration: const Duration(seconds :1)
-        ),
+            //회원 가입 페이지 이동
+            name: '/register',
+            page: () => const RegisterPage(),
+            transition: Transition.fadeIn,
+            transitionDuration: const Duration(seconds: 1)),
         GetPage(
-          // 비밀번호 찾기 페이지로 이동 
-          name: '/findPw',
-          page: () => const FindPasswordPage(),
-          transition: Transition.downToUp,
-          transitionDuration: const Duration(seconds :1)
-        ),
+            // 비밀번호 찾기 페이지로 이동
+            name: '/findPw',
+            page: () => const FindPasswordPage(),
+            transition: Transition.downToUp,
+            transitionDuration: const Duration(seconds: 1)),
         GetPage(
-          // 비밀번호 찾기 페이지로 이동 
-          name: '/MyAreaList',
-          page: () => const MyAreaList(),
-          transition: Transition.downToUp,
-          transitionDuration: const Duration(seconds :1)
-        ),
+            // 비밀번호 찾기 페이지로 이동
+            name: '/MyAreaList',
+            page: () => const MyAreaList(),
+            transition: Transition.downToUp,
+            transitionDuration: const Duration(seconds: 1)),
       ],
-
-
     );
   }
-}// END
+} // END
