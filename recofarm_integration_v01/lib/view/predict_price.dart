@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -38,7 +36,7 @@ class _Predict_PriceState extends State<Predict_Price> {
 
   intiSharedPreference() async {
     SharedPreferences ref = await SharedPreferences.getInstance();
-    predictYield = ref.getDouble('predict')!;
+    predictYield = ref.getDouble('predict') ?? 0;
     print('예측값 : $predictYield');
     // print(predictYield);
     // return double.parse(ref.getDouble('predict').toString());
@@ -109,6 +107,7 @@ class _Predict_PriceState extends State<Predict_Price> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
+                  predictYield == 0 ? '' :
                   '5월 출고 예측 판매 수입 : ${(predictYield * 100 * 10050).round().toString()} 원',
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 ),
