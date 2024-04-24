@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 // import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -43,7 +44,11 @@ import 'package:syncfusion_flutter_charts/charts.dart';
         - shared pref 설정 세팅 및 함수 정리 
         - 관심농지로 추가 버튼 눌렀을때  재배작물과 면적을 입력받도록 하자. 
         - floating action button 을 사용해서 현재위치로 바로가기 기능을 만들자. 
-        - 
+      2024.04.24 by pdg 
+        - 지도에 마커 뜨도록 하는 기능 
+          -> 마커 색상 변경
+        - 롱탭하여 관심농지로 추가누르면 마커색이 빨간색으로 변함.  
+
   Detail      : - 
 
 */
@@ -56,25 +61,31 @@ class InterestingAreaPage extends StatefulWidget {
 
 class _InterestingAreaPageState extends State<InterestingAreaPage> {
   // properties
+  late int longTapCounter;
+
+  late int currentLocGetCallCount;
   late TextEditingController locationTfController;
   // Geometric properties
-  late LatLng? curLoc;
-  late LatLng interestLoc;
-  late bool islocationEnable;
+  late LatLng? curLoc; // 현재 위치 위도경도
+  late LatLng interestLoc; // 관심 위치 위도 경도 ( 검색시 입력값이 들어감. )
+  late bool islocationEnable; // 지도 권한 ok -> true
   // Marker
-  late Marker curLocMarker;
-  late Marker myloc1;
-  late Marker? findMarker;
+  late Marker curLocMarker; // 현재위치 마커
+  late Marker myloc1; // 기본
+  late Marker? findMarker; // 검색한 위치의 마커
 
   late Circle myAreaCircle;
   late double myAreaMeterSquare;
   late double myAreaRadius;
   late double distance1;
+
+  // 검색한 주소의 Formatted address
   late String searchedAddress;
   // google map 컨트롤러!!
   late GoogleMapController mapController;
   // markers
-  late List markers;
+  late List markers; // 내가 검색한 장소들이 다 들어가 있음.
+  late Set<Marker> selectedAreaMarker;
   late List myareaMarkerList;
   // myarea
   late List myareaData;
@@ -99,13 +110,25 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   @override
   void initState() {
     super.initState();
+    longTapCounter = 0;
 
+    // selected area( long tap setting ) -> 선택한 지역의 마커는 페이지 실행될때마다 초기화 됨.
+    selectedAreaMarker = {};
+
+    // 현재위치 파악
+    currentLocGetCallCount = 0;
+    curLoc = null;
+    _curPositiongGet(); // ->  curLoc
+    _curPosGenCalcDistance();
+    _curLocAddressGet();
+
+    // 검색한곳 마커
     findMarker = null;
-    // text field init
+    // 면적과 품종을 입력받을 text field init
     myareaSizeTFcontroller = TextEditingController(text: "");
     myareaProductTFcontroller = TextEditingController(text: "");
+
     // mysql variable init
-    curLoc = null;
     userId = "";
     myareaProduct = "";
     myareaMarkerList = [];
@@ -212,26 +235,47 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
             );
           }
           if (snapshot.data == "위치 권한이 허가 되었습니다.") {
+            _curPositiongGet();
+
             ///----------------------------------<< Screen 화면 >>------------------------------------------
             return Column(
               children: [
-                // Google map view
-                Expanded(
-                  flex: 2, // 화면 2분할
-                  child: GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                        // 최초 맵 시작지점 <- 내현재위치 .
-                        target: curLoc!,
-                        zoom: 14.4746,
-                      ),
-                      myLocationButtonEnabled: true,
-                      // 마커와 내 반경 설정
-                      markers: Set.from([curLocMarker]),
-                      circles: Set.from([myAreaCircle]),
-
-                      // controller setting
-                      onMapCreated: _onMapCreated),
+                Text(
+                  "길게 눌러서 지역을 선택하세요",
+                  style: TextStyle(color: Colors.purple, fontSize: 20),
                 ),
+                curLoc == null
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    // Google map view
+                    : 
+                    Expanded(
+                        flex: 2, // 화면 2분할
+                        child: GoogleMap(
+                            //mapType: MapType.normal,
+                            //buildingsEnabled: true,
+                            onLongPress: (postion) =>
+                                _longTapSelectPosition(postion),
+                            initialCameraPosition: CameraPosition(
+                              // 최초 맵 시작지점 <- 내현재위치 .
+                              target: curLoc!,
+                              zoom: 14.4746,
+                            ),
+                            // myLocationButtonEnabled: true,
+                            // compassEnabled: true,
+                            // zoomGesturesEnabled: true,
+                            // rotateGesturesEnabled: true,
+                            // mapToolbarEnabled: true,
+                            //gestureRecognizers: ,
+                            // 마커와 내 반경 설정
+                            markers:
+                                selectedAreaMarker, //Set.from([curLocMarker],),
+                            circles: Set.from([myAreaCircle]),
+
+                            // controller setting
+                            onMapCreated: _onMapCreated),
+                      ),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -240,7 +284,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
 
                       Text(searchedAddress),
 
-                      Text("현위치에서 거리 : ${distance1.toStringAsFixed(2)} km"),
+                      Text("관심 지역까지 거리 : ${distance1.toStringAsFixed(2)} km"),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -281,7 +325,36 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     );
   }
 
-  // Function
+  // Functions
+
+  //2024.04.24 update
+  _longTapSelectPosition(LatLng longTapPostion) {
+    longTapCounter++;
+    // 마커 추가
+    Marker newMarker = Marker(
+      markerId: MarkerId(longTapPostion.toString()),
+      position: longTapPostion,
+      infoWindow: InfoWindow(title: '관심소재지'),
+      icon: BitmapDescriptor.defaultMarkerWithHue(
+          BitmapDescriptor.hueBlue), // 마커 아이콘 설정
+    );
+    // map 이동
+    mapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: longTapPostion,
+          zoom: 14.4746,
+        ),
+      ),
+    );
+
+    // 마커 세트 업데이트
+    selectedAreaMarker.add(newMarker);
+    setState(() {});
+    // 소재지 정보 업데이트
+    getPlaceAddress(longTapPostion.latitude, longTapPostion.longitude);
+  }
+
   // 2024.04.23 updated
   _showBottomSheetForInput() {
     // Desc : 관심 농작품과 재배면적 을 받는 bottom sheet
@@ -343,6 +416,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     );
   }
 
+  // 2024.04.23 Updated beloow
   _insertMyArea(curLat, curLng) async {
     // Desc : 내관심 소재지 mySQL DB 에서 정보 가져오는 함수
     // Update : 2024.04.22 by pdg
@@ -375,8 +449,9 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   }
 
   // 2024.04.22 Udated bellow
-
   // 내 소재지 정보 불러오는 함수 .
+
+
   _getMyareaJSONData() async {
     // Desc : 내관심 소재지 mySQL DB 에서 정보 가져오는 함수
     // Update : 2024.04.22 by pdg
@@ -395,6 +470,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   }
 
   _showMyAreaActionSheet() {
+    _getMyareaJSONData();
     showCupertinoModalPopup(
       semanticsDismissible: true,
       context: context,
@@ -416,41 +492,38 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                   myareaData.length,
                   (index) => Slidable(
                     startActionPane: ActionPane(
-
-                          motion: const BehindMotion(),
-                          children: [
-                            SlidableAction(
-                              spacing: 1,
-                              backgroundColor: const Color.fromARGB(255, 75, 152, 214),
-                              icon: Icons.edit,
-                              label: "수정",
-                              onPressed: (context) {
-                                Get.defaultDialog(
-                                  
-                                  content:MyAreaEdit(
-                                    myareaSize: myareaData[index]['area_size'],
-                                    myareaProduct: myareaData[index]['area_product']
-                                  ) ,
-                                );
-                                print("수정 슬라이드 ");
-                              },
-                            )
-                          ],
-                        ),
-                        endActionPane: ActionPane(
-                          motion: StretchMotion(),
-                          children: [
-                            SlidableAction(
-                              onPressed: (context) {
-                              
-                              },
-                              backgroundColor: const Color.fromARGB(255, 211, 94, 86),
-                              icon: Icons.edit,
-                              label: "삭제",
-                              )
-                          ],
-                        ),
-
+                      motion: const BehindMotion(),
+                      children: [
+                        SlidableAction(
+                          spacing: 1,
+                          backgroundColor:
+                              const Color.fromARGB(255, 75, 152, 214),
+                          icon: Icons.edit,
+                          label: "수정",
+                          onPressed: (context) {
+                            Get.defaultDialog(
+                              content: MyAreaEdit(
+                                  myareaSize: myareaData[index]['area_size'],
+                                  myareaProduct: myareaData[index]
+                                      ['area_product']),
+                            );
+                            print("수정 슬라이드 ");
+                          },
+                        )
+                      ],
+                    ),
+                    endActionPane: ActionPane(
+                      motion: StretchMotion(),
+                      children: [
+                        SlidableAction(
+                          onPressed: (context) {},
+                          backgroundColor:
+                              const Color.fromARGB(255, 211, 94, 86),
+                          icon: Icons.edit,
+                          label: "삭제",
+                        )
+                      ],
+                    ),
                     child: CupertinoActionSheetAction(
                       onPressed: () {
                         print("clicked");
@@ -474,12 +547,15 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                               style: TextStyle(fontSize: 15),
                             ),
                             SizedBox(
-                              width: 50,
+                              width: 120,
                               child: ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  // 생산량 예측 함수 
+                                  
+                                },
                                 child: const Text(
-                                  "예측",
-                                  style: TextStyle(fontSize: 15),
+                                  "생산량 예측하기",
+                                  style: TextStyle(fontSize: 20),
                                 ),
                               ),
                             )
@@ -514,11 +590,14 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     );
   }
 
+
   _addMyAreaDialog() {
+    // Desc : 현재 위치를 관심 소재지로 추가하는 함수 
+    // Date : 2024.04.24 by pdg
     Get.defaultDialog(
       barrierDismissible: true,
       title: "관심소재지 등록",
-      middleText: " $myareaAddress를 관심 소재지로 등록하시겠습니까?",
+      middleText: " $searchedAddress 관심 소재지로 등록하시겠습니까?",
       actions: [
         ElevatedButton(
           onPressed: () {
@@ -536,6 +615,27 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   // 2024.04.21 Updated Below
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+  }
+
+  _curLocAddressGet() async {
+    // Desc : 현재 위치의 주소 정보를 가져오는 함수
+    // Date : 2024.04.24 by pdg
+    //  - Curposition 에서 위치를 검색하여 소재지 주소를 받아온다 . => search_address 에 업데이트 한다 .
+    var curPosition = await Geolocator.getCurrentPosition();
+
+    var findAddressUri = Uri.parse(
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=${curPosition.latitude},${curPosition.longitude}&language=ko&key=AIzaSyDslR-okT6JXHWhMmrOXaNxXhA6C0LxJHo');
+
+    var responseFAU = await http.get(findAddressUri);
+    // Json 확인
+    //print(responseFAU.body)
+    // Json data convert
+    var dataCovertedJSON = json.decode(utf8.decode(responseFAU.bodyBytes));
+
+    List address_result = dataCovertedJSON['results'];
+    // Formatted address 를 업데이트
+    searchedAddress = address_result[0]['formatted_address'];
+    setState(() {});
   }
 
   searchPlace() async {
@@ -582,27 +682,81 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
 
   // 내가 입력한 주소의 위도경도를 아웃풋.
   getPlaceAddress(double lat, double lng) async {
-    //var findLatlngUri =Uri.parse("https:/maps.googleapis.com/maps/api/geocode/json?address=${locationTfController.text}&key=AIzaSyDslR-okT6JXHWhMmrOXaNxXhA6C0LxJHo");
+    // Desc : 위도와 경도를 입력받아서 소재지의 주소 변수를 업데이트함.
+    // Date :  2024.04.21
+    //
     var findAddressUri = Uri.parse(
         'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&language=ko&key=AIzaSyDslR-okT6JXHWhMmrOXaNxXhA6C0LxJHo');
-    //var responseFLU = await http.get(findLatlngUri);
-    var responseFAU = await http.get(findAddressUri);
 
-    //print(responseFAU.body);
+    var responseFAU = await http.get(findAddressUri);
+    // Json 확인
+    //print(responseFAU.body)
+    // Json data convert
     var dataCovertedJSON = json.decode(utf8.decode(responseFAU.bodyBytes));
+
     List address_result = dataCovertedJSON['results'];
+    // Formatted address 를 업데이트
     searchedAddress = address_result[0]['formatted_address'];
     //print(address_result);
-    curLoc = LatLng(address_result[0]['geometry']['location']['lat'],
+    // 검색한 주소로 맵의 위치가 이동하면서 관심 지역 위도 경도 변수가 업데이트 된다.
+    interestLoc = LatLng(address_result[0]['geometry']['location']['lat'],
         address_result[0]['geometry']['location']['lng']);
     // data.addAll(result);
-    setState(() {});
+    // 나의 주소 <- 검색한주소 : 변경 필요
     myareaAddress = searchedAddress;
+    setState(() {});
     //return searchedAddress;
   }
 
-  // 내 위치와 관심 경작지 위치의 거리를 계산해줌.
+  _curPositiongGet() async {
+    // Desc : 현재위치 받아 업데이트 하는 함수
+    // Date : 2024.04.24  by pdg
+    currentLocGetCallCount++;
+    if (currentLocGetCallCount < 5) {
+      var curPosition = await Geolocator.getCurrentPosition();
+      curLoc = LatLng(curPosition.latitude, curPosition.longitude);
+
+      // 현재위치 주소 가져오는 함수 실행
+
+      // 현재위치 주소 에대한 마커 설정
+      curLocMarker = Marker(
+          markerId: const MarkerId("현재위치"),
+          position: curLoc!,
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
+          infoWindow: const InfoWindow(
+            title: "현재위치 ",
+            snippet: "",
+          ));
+      print(" 현재위치가 설정되었습니다 ");
+
+      var findAddressUri = Uri.parse(
+          'https://maps.googleapis.com/maps/api/geocode/json?latlng=${curPosition.latitude},${curPosition.longitude}&language=ko&key=AIzaSyDslR-okT6JXHWhMmrOXaNxXhA6C0LxJHo');
+
+      var responseFAU = await http.get(findAddressUri);
+      // Json 확인
+      //print(responseFAU.body)
+      // Json data convert
+      setState(() {
+        var dataCovertedJSON = json.decode(utf8.decode(responseFAU.bodyBytes));
+
+        List address_result = dataCovertedJSON['results'];
+        // Formatted address 를 업데이트
+        searchedAddress = address_result[0]['formatted_address'];
+        //print(address_result);
+        // 검색한 주소로 맵의 위치가 이동하면서 관심 지역 위도 경도 변수가 업데이트 된다.
+        interestLoc = LatLng(address_result[0]['geometry']['location']['lat'],
+            address_result[0]['geometry']['location']['lng']);
+        // data.addAll(result);
+        // 나의 주소 <- 검색한주소 : 변경 필요
+        myareaAddress = searchedAddress;
+      });
+    }
+  }
+
   _curPosGenCalcDistance() async {
+    // Desc : 내 위치와 관심 경작지 위치의 거리 계산 함수
+    // Date : 2024.04.24 by pdg
     // 현재 위치 파악
     var curPosition = await Geolocator.getCurrentPosition();
     // 내 관심경작지와의 거리 파악
@@ -612,21 +766,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
             interestLoc.latitude,
             interestLoc.longitude) /
         1000.0;
-    //print(" curloc 변수를 저장합니다. ");
-    curLoc = LatLng(curPosition.latitude, curPosition.longitude);
-    curLocMarker = Marker(
-      markerId: const MarkerId("현재위치"),
-      position: curLoc!,
-      infoWindow: const InfoWindow(
-        title: "현재위치 ",
-        snippet: "",
-      ),
-    );
-
-    print(" >> 현재위치 주소 : $searchedAddress");
-
     setState(() {});
-    // return LatLng(curPosition.latitude, curPosition.longitude);
   }
 
   // 내위치  파악 및 권한 설정 함수
