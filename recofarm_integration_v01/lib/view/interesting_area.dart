@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -11,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:latlong2/latlong.dart' as latlong;
 import 'package:new_recofarm_app/view/my_area_list.dart';
 import 'package:new_recofarm_app/view/myarea_edit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -372,19 +372,25 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   _predictAction(areaSize, myareaLat, myareaLng) async {
     //double areaSize = 0;
     //areaSize = double.parse(areaController.text);
+    double nearLat = 0;
     print("예측시작");
 
-    var url = Uri.parse(
-        'http://192.168.50.69:8080/predict?areaSize=${areaSize}&lat=$myareaLat&lng=$myareaLng');
-    print(url);
-    //var response = await http.readBytes(url);
-    //double result = json.decode(utf8.decode(response));
+    nearLat = await nearLatLng(latlong.LatLng(myareaLat, myareaLng));
 
-    print("11");
+      print(nearLat);
+
+    var url = Uri.parse(
+        'http://192.168.50.69:8080/predict?areaSize=${areaSize}&lat=$myareaLat&lng=$myareaLng&nearLat=$nearLat');
+    print(url);
+    var response = await http.readBytes(url);
+    double result = json.decode(utf8.decode(response));
+
+//    print("11");
     Get.defaultDialog(
         title: '결과',
         middleText:
-            "서버점검중입니다 \n 09:00~23:00", //'예상 수확량은 ${result.toStringAsFixed(2)}톤 입니다.\n',
+            //"서버점검중입니다 \n 09:00~23:00", 
+            '예상 수확량은 ${result.toStringAsFixed(2)}톤 입니다.\n',
         actions: [
           ElevatedButton(onPressed: () => Get.back(), child: const Text('확인'))
         ]);
@@ -713,6 +719,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
           },
           child: Text("예"),
         ),
+        SizedBox(width: 10,),
         ElevatedButton(onPressed: () => Get.back(), child: Text("아니오")),
       ],
     );
@@ -900,4 +907,46 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     // 위의 모든 조건이 통과되면 위치 권한 허가 가 완료 된것임.
     return "위치 권한이 허가 되었습니다.";
   }
+
+
+  
+  nearLatLng(originalLatLng) {
+
+    List<Map> placeListLocation = [
+    { 'lat' : 37.2343060386837, 'lng' : 127.201357139725,}, // '경기도 용인시 처인구',
+    { 'lat' : 36.3622851114392, 'lng' : 127.356257593324,}, // '대전광역시 유성구',
+    { 'lat' : 36.8153571576607, 'lng' : 127.786652163107,}, //  '충청북도 괴산군',
+    { 'lat' : 36.9910490160221, 'lng' : 127.925961035784,}, // '충청북도 충주시',
+    { 'lat' : 36.855378991826, 'lng' : 127.435536085976,}, // '충청북도 진천군',
+    { 'lat' : 35.5698491739949, 'lng' : 126.8560,}, // '전라북도 정읍시',
+    { 'lat' : 35.7316577924649, 'lng' : 126.7330,}, //  '전라북도 부안군',
+    { 'lat' : 34.6420615268858, 'lng' : 126.7672,}, //  '전라남도 강진군',
+    { 'lat' : 34.486828620348, 'lng' : 126.2634,}, // '전라남도 진도군',
+    { 'lat' : 34.5735165884839, 'lng' : 126.5993,}, //  '전라남도 해남군',
+    { 'lat' : 36.0437417308541, 'lng' : 129.3686,}, //  '경상북도 포항시 북구',
+    { 'lat' : 36.4150618798074, 'lng' : 129.3653,}, // '경상북도 영덕군',
+    { 'lat' : 36.6667028574142, 'lng' : 129.1125,}, // '경상북도 영양군',
+    { 'lat' : 35.2285653558628, 'lng' : 128.8894,}, // '경상남도 김해시',
+    { 'lat' : 34.8544448244005, 'lng' : 128.4331,}, //  '경상남도 통영시',
+  ];
+  
+    double nearLat = 0;
+    
+    latlong.Haversine haverCalc = latlong.Haversine();
+
+    double nearDistance = haverCalc.distance(originalLatLng, latlong.LatLng(placeListLocation[0]['lat'], placeListLocation[0]['lng']));
+
+    print(nearDistance);
+
+    for(int j=0; j<placeListLocation.length; j++) {
+      if(nearDistance > haverCalc.distance(originalLatLng, latlong.LatLng(placeListLocation[j]['lat'], placeListLocation[j]['lng']))) {
+        nearDistance = haverCalc.distance(originalLatLng, latlong.LatLng(placeListLocation[j]['lat'], placeListLocation[j]['lng']));
+        nearLat = placeListLocation[j]['lat'];
+        print(nearLat);
+      }
+    }
+    // update();
+    return nearLat;
+  }
+
 } // END
