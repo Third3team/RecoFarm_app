@@ -372,12 +372,13 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   _predictAction(areaSize, myareaLat, myareaLng) async {
     //double areaSize = 0;
     //areaSize = double.parse(areaController.text);
+    print('predict : $myareaLat');
+    print('predict : $myareaLng');
     double nearLat = 0;
-    print("예측시작");
-
     nearLat = await nearLatLng(latlong.LatLng(myareaLat, myareaLng));
-
-      print(nearLat);
+    
+    print("예측시작");
+    print('predictAction nearLat : $nearLat');
 
     var url = Uri.parse(
         'http://192.168.50.69:8080/predict?areaSize=${areaSize}&lat=$myareaLat&lng=$myareaLng&nearLat=$nearLat');
@@ -910,8 +911,8 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
 
 
   
-  nearLatLng(originalLatLng) {
-
+  nearLatLng(latlong.LatLng originalLatLng) {
+    // 위치 List
     List<Map> placeListLocation = [
     { 'lat' : 37.2343060386837, 'lng' : 127.201357139725,}, // '경기도 용인시 처인구',
     { 'lat' : 36.3622851114392, 'lng' : 127.356257593324,}, // '대전광역시 유성구',
@@ -929,23 +930,24 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     { 'lat' : 35.2285653558628, 'lng' : 128.8894,}, // '경상남도 김해시',
     { 'lat' : 34.8544448244005, 'lng' : 128.4331,}, //  '경상남도 통영시',
   ];
-  
+    // 가장 가까운 위치의 위도
     double nearLat = 0;
     
-    latlong.Haversine haverCalc = latlong.Haversine();
+    latlong.Haversine haverCalc = const latlong.Haversine();
 
+    // 초기값 : 단순히 첫번쨰의 값으로 비교하여 넣음
     double nearDistance = haverCalc.distance(originalLatLng, latlong.LatLng(placeListLocation[0]['lat'], placeListLocation[0]['lng']));
+    nearLat = placeListLocation[0]['lat'];
+    // --------
 
-    print(nearDistance);
-
+    // for문을 통해 최소값 확인
     for(int j=0; j<placeListLocation.length; j++) {
       if(nearDistance > haverCalc.distance(originalLatLng, latlong.LatLng(placeListLocation[j]['lat'], placeListLocation[j]['lng']))) {
+        // 최솟값일때, 비교를 위해 값들을 따로 저장
         nearDistance = haverCalc.distance(originalLatLng, latlong.LatLng(placeListLocation[j]['lat'], placeListLocation[j]['lng']));
         nearLat = placeListLocation[j]['lat'];
-        print(nearLat);
       }
     }
-    // update();
     return nearLat;
   }
 
