@@ -48,6 +48,8 @@ class HomeViewPage extends StatelessWidget {
     final UserMySQL userMySQL = Get.put(UserMySQL());
     userMySQL.getAreaData(userId!);
     UserFirebase firebase = UserFirebase();
+    // initSharedPreferences();
+    print(userId);
     // final userMySQL = Provider.of<UserMySQL>(context);
     // initSharedPreferences();
     final NapaCabbageAPI cabbageController = Get.put(NapaCabbageAPI());
@@ -125,6 +127,7 @@ class HomeViewPage extends StatelessWidget {
                                             builder: (userController, snapshot) {
                                               if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                                                 List<UserArea> areas = snapshot.data!;
+                                                userMySQL.count = 100;
                                                 return Swiper(
                                                   loop: false,
                                                   itemBuilder: (context, index) {
