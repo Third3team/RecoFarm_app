@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 
 class VMpredict extends GetxController{
 
@@ -16,6 +17,9 @@ class VMpredict extends GetxController{
 
   double? latData;
   double? lngData;
+
+  double nearLat = 0;
+  // double naerLng = 0;
 
   List<String> placeList = [
     '경기도 용인시 처인구',
@@ -110,7 +114,4 @@ class VMpredict extends GetxController{
       )
     );
   }
-
-
-
 }
