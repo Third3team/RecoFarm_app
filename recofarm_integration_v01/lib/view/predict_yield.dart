@@ -240,7 +240,7 @@ class PredictYield extends StatelessWidget {
       areaSize = areaSize * 3.3;
     }
 
-    var url = Uri.parse('http://192.168.50.69:8080/predict?areaSize=${areaSize}&lat=${vmPredictController.latData}&lng=${vmPredictController.lngData}');
+    var url = Uri.parse('http://192.168.50.69:8080/predict?areaSize=${areaSize}&lat=${vmPredictController.latData}&lng=${vmPredictController.lngData}&nearLat=${vmPredictController.latData}');
     var response = await http.readBytes(url);
     double result = json.decode(utf8.decode(response));
 
