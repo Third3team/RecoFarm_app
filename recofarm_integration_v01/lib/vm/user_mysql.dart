@@ -1,14 +1,20 @@
 import 'dart:convert';
-
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:new_recofarm_app/model/user_area.dart';
 
-class UserMySQL {
+class UserMySQL extends GetxController {
 
-  List<UserArea> areaList = [];
+  Future<List<UserArea>> areaList = Future(() => []);
 
+  int count = 0;
 
-  Future<List<UserArea>> getAreaData(String userId) async {
+  getAreaData(String userId) async {
+    // areaList.clear();
+    areaList.then((list) {
+    list.clear(); // 리스트 비우기
+   });
+
     // Forrest IP : 192.168.50.69
     var url = Uri.parse('http://192.168.50.69:8080/myarea?userId=$userId');
     var response = await http.readBytes(url);
@@ -25,12 +31,20 @@ class UserMySQL {
 
       UserArea userArea = UserArea(area_code: areaCode, userId: userId, area_lat: areaLat, area_lng: areaLng, area_size: areaSize, area_product: areaProduct, area_address: areaAddress);
 
-      areaList.add(userArea);
+      // areaList.add(userArea);
+      areaList.then((list) {
+        list.add(userArea); // 리스트 비우기
+      });
+      
+    }
+    
+    if(count < 10) {
+    update();
     }
 
-    // print(areaList.length);
+    count ++;
 
-    return areaList;
+    // return areaList;
 
   }
 

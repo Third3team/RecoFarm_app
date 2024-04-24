@@ -31,21 +31,30 @@ import 'package:shared_preferences/shared_preferences.dart';
 // ignore: must_be_immutable
 class HomeViewPage extends StatelessWidget {
   String? userId = '';
+  // late Future<List<UserArea>> areaList;
+  // UserMySQL userMySQL = UserMySQL();
+  
 
   initSharedPreferences() async {
-    final pref = await SharedPreferences.getInstance();
+    final SharedPreferences pref = await SharedPreferences.getInstance();
     userId = pref.getString('userId') ?? FirebaseAuth.instance.currentUser?.email;
   }
+
 
   HomeViewPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    initSharedPreferences();
+    final UserMySQL userMySQL = Get.put(UserMySQL());
+    userMySQL.getAreaData(userId!);
+    UserFirebase firebase = UserFirebase();
+    // final userMySQL = Provider.of<UserMySQL>(context);
+    // initSharedPreferences();
     final NapaCabbageAPI cabbageController = Get.put(NapaCabbageAPI());
     cabbageController.fetchXmlData();
+    // areaList = userMySQL.areaList;
 
-    final Future<List<UserArea>> areaList = UserMySQL().getAreaData(userId!);
+    // print('mysql에서 불러올 : $userId');
 
     return FutureBuilder(
       future: initSharedPreferences(),
@@ -64,7 +73,7 @@ class HomeViewPage extends StatelessWidget {
               drawer: DrawerWidget(userId: userId),
               body: SingleChildScrollView(
                 child: StreamBuilder<QuerySnapshot>(
-                  stream: UserFirebase().selectUserEqaulID(userId!),
+                  stream: firebase.selectUserEqaulID(userId!),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       // 불러온 데이터가 있을 때,
@@ -90,21 +99,13 @@ class HomeViewPage extends StatelessWidget {
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            snapshot.data!.docs.isNotEmpty
-                                                ? snapshot.data!.docs[0]
-                                                    ['userName']
-                                                : FirebaseAuth
-                                                        .instance
-                                                        .currentUser
-                                                        ?.displayName ??
-                                                    '',
+                                            snapshot.data!.docs.isNotEmpty? snapshot.data!.docs[0]['userName']: FirebaseAuth.instance.currentUser?.displayName ?? '',
                                             style: const TextStyle(
-                                                fontSize: 30,
-                                                fontWeight: FontWeight.bold),
+                                              fontSize: 30,
+                                              fontWeight: FontWeight.bold),
                                           ),
                                           const Text(
                                             '님의 관심 농작지',
@@ -113,178 +114,186 @@ class HomeViewPage extends StatelessWidget {
                                         ],
                                       ),
                                     ),
-                                    SizedBox(
-                                      width: 300,
-                                      height: 300,
-                                      child: FutureBuilder(
-                                        future: areaList,
-                                        builder: (context, snapshot) {
-                                          print(areaList);
-                                          if (snapshot.hasData &&
-                                              snapshot.data!.isNotEmpty) {
-                                            print('epdlxj');
-                                            List<UserArea> areas =
-                                                snapshot.data!;
-                                            return Swiper(
-                                              itemBuilder: (context, index) {
-                                                // Swiper 배경색
-                                                Color? backgroundColor;
-                                                backgroundColor = index % 2 == 0
-                                                    ? Theme.of(context)
-                                                        .colorScheme
-                                                        .secondaryContainer
-                                                    : Theme.of(context)
-                                                        .colorScheme
-                                                        .errorContainer;
+                                    GetBuilder<UserMySQL>(
+                                      builder: (userController) {
+                                        userMySQL.getAreaData(userId!);
+                                        return SizedBox(
+                                          width: 300,
+                                          height: 300,
+                                          child: FutureBuilder(
+                                            future: userController.areaList,
+                                            builder: (userController, snapshot) {
+                                              if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                                                List<UserArea> areas = snapshot.data!;
+                                                return Swiper(
+                                                  loop: false,
+                                                  itemBuilder: (context, index) {
+                                                    // Swiper 배경색
+                                                    Color? backgroundColor;
+                                                    backgroundColor = index % 2 == 0 ? Theme.of(context).colorScheme.secondaryContainer
+                                                        : Theme.of(context).colorScheme.errorContainer;
+                                                    return Container(
+                                                      color: backgroundColor,
+                                                      child: Column(
+                                                        mainAxisAlignment:MainAxisAlignment.center,
+                                                        children: [
+                                                          Stack(
+                                                            children: [
+                                                              SizedBox(
+                                                                width: 300,
+                                                                height: 90,
+                                                                child: Text(
+                                                                  areas[index]
+                                                                      .area_address,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize: 30,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                              ),
+                                                              const Positioned(
+                                                                  left: 190,
+                                                                  top: -8,
+                                                                  child: Text(
+                                                                    '* 농작지 이름',
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            20,
+                                                                        color: Colors
+                                                                            .red),
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                          Padding(
+                                                            padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
+                                                            child: Container(
+                                                              color: Color.fromARGB(255, 255, 255, 255),
+                                                              width: MediaQuery.of(context).size.width,
+                                                              height: 5,
+                                                            ),
+                                                          ),
+                                                          Stack(
+                                                            children: [
+                                                              SizedBox(
+                                                                width: 300,
+                                                                height: 50,
+                                                                child: Text(
+                                                                  '${areas[index].area_size}',
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize: 30,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                              ),
+                                                              const Positioned(
+                                                                  left: 190,
+                                                                  top: -5,
+                                                                  child: Text(
+                                                                    '* 농작지 면적',
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            20,
+                                                                        color: Colors
+                                                                            .red),
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                          Padding(
+                                                            padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                                            child: Container(
+                                                              color: Color.fromARGB(255, 255, 255, 255),
+                                                              width: MediaQuery.of(context).size.width,
+                                                              height: 5,
+                                                            ),
+                                                          ),
+                                                          Stack(
+                                                            children: [
+                                                              SizedBox(
+                                                                width: 300,
+                                                                height: 50,
+                                                                child: Text(
+                                                                  areas[index]
+                                                                      .area_product,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize: 30,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                              ),
+                                                              const Positioned(
+                                                                  left: 190,
+                                                                  top: -5,
+                                                                  child: Text(
+                                                                    '* 농작지 작물',
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            20,
+                                                                        color: Colors
+                                                                            .red),
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                  itemCount: areas.length,
+                                                  pagination: const SwiperPagination(),
+                                                );
+                                              } else {
                                                 return Container(
-                                                  color: backgroundColor,
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Stack(
+                                                  decoration: BoxDecoration(
+                                                      color: Theme.of(context).colorScheme.secondaryContainer,
+                                                      borderRadius:
+                                                          const BorderRadius.all(
+                                                              Radius.circular(10))),
+                                                  child: Swiper(
+                                                    itemCount: 1,
+                                                    loop: false,
+                                                    itemBuilder: (context, index) {
+                                                      return Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
                                                         children: [
-                                                          SizedBox(
-                                                            width: 300,
-                                                            height: 80,
-                                                            child: Text(
-                                                              areas[index]
-                                                                  .area_address,
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 30,
-                                                              ),
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                            ),
-                                                          ),
-                                                          const Positioned(
-                                                              left: 190,
-                                                              top: -10,
-                                                              child: Text(
-                                                                '* 농작지 이름',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    color: Colors
-                                                                        .red),
-                                                              ))
+                                                          const Text(
+                                                              '아직 관심 농작지를 \n등록하지 않았습니다!'),
+                                                          Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .fromLTRB(
+                                                                      0, 20, 0, 0),
+                                                              child: TextButton(
+                                                                  onPressed: () {
+                                                                    // Map으로 연결시켜 등록하게 한다.
+                                                                    Get.toNamed(
+                                                                        "/interestArea");
+                                                                  },
+                                                                  child: const Text(
+                                                                    '등록하기',
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .blue),
+                                                                  )))
                                                         ],
-                                                      ),
-                                                      Stack(
-                                                        children: [
-                                                          SizedBox(
-                                                            width: 300,
-                                                            height: 80,
-                                                            child: Text(
-                                                              '${areas[index].area_size}',
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 30,
-                                                              ),
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                            ),
-                                                          ),
-                                                          const Positioned(
-                                                              left: 190,
-                                                              top: -5,
-                                                              child: Text(
-                                                                '* 농작지 면적',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    color: Colors
-                                                                        .red),
-                                                              ))
-                                                        ],
-                                                      ),
-                                                      Stack(
-                                                        children: [
-                                                          SizedBox(
-                                                            width: 300,
-                                                            height: 80,
-                                                            child: Text(
-                                                              areas[index]
-                                                                  .area_product,
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 30,
-                                                              ),
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                            ),
-                                                          ),
-                                                          const Positioned(
-                                                              left: 190,
-                                                              top: -5,
-                                                              child: Text(
-                                                                '* 농작지 작물',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    color: Colors
-                                                                        .red),
-                                                              ))
-                                                        ],
-                                                      ),
-                                                    ],
+                                                      );
+                                                    },
                                                   ),
                                                 );
-                                              },
-                                              itemCount: areas.length,
-                                              pagination:
-                                                  const SwiperPagination(),
-                                            );
-                                          } else {
-                                            return Container(
-                                              decoration: BoxDecoration(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .secondaryContainer,
-                                                  borderRadius:
-                                                      const BorderRadius.all(
-                                                          Radius.circular(10))),
-                                              child: Swiper(
-                                                itemCount: 1,
-                                                loop: false,
-                                                itemBuilder: (context, index) {
-                                                  return Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      const Text(
-                                                          '아직 관심 농작지를 \n등록하지 않았습니다!'),
-                                                      Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .fromLTRB(
-                                                                  0, 20, 0, 0),
-                                                          child: TextButton(
-                                                              onPressed: () {
-                                                                // Map으로 연결시켜 등록하게 한다.
-                                                                Get.toNamed(
-                                                                    "/interestArea");
-                                                              },
-                                                              child: const Text(
-                                                                '등록하기',
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .blue),
-                                                              )))
-                                                    ],
-                                                  );
-                                                },
-                                              ),
-                                            );
-                                          }
-                                        },
-                                      ),
+                                              }
+                                            },
+                                          ),
+                                        );
+                                      }
                                     )
                                   ],
                                 ),
