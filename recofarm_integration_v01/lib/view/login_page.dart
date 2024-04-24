@@ -72,7 +72,7 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 50.0),
+                  const SizedBox(height: 20.0),
                   Image.asset(
                     "images/farmer.png",
                     height: 200,
@@ -322,19 +322,19 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                 const SizedBox(
                   width: 10,
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    // 비밀번호찾기 페이지로 이동
-                    Get.toNamed('/findPw');
-                  },
-                  style: ElevatedButton.styleFrom(
-                      shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)))),
-                  child: const Text(
-                    '비밀번호찾기',
-                    style: TextStyle(color: Color.fromARGB(255, 65, 154, 9)),
-                  ),
-                ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     // 비밀번호찾기 페이지로 이동
+                //     Get.toNamed('/findPw');
+                //   },
+                //   style: ElevatedButton.styleFrom(
+                //       shape: const RoundedRectangleBorder(
+                //           borderRadius: BorderRadius.all(Radius.circular(15)))),
+                //   child: const Text(
+                //     '비밀번호찾기',
+                //     style: TextStyle(color: Color.fromARGB(255, 65, 154, 9)),
+                //   ),
+                // ),
               ],
             ),
             const SizedBox(
@@ -353,14 +353,24 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                 // ----------------------
 
                 // 구글 로그인 버튼
-                IconButton(
-                  onPressed: () async {
-                    await signInWithGoogle();
-                  },
-                  icon: Image.asset(
-                    "images/naver/btnW_.png",
-                    width: 100,
-                  ),
+                Row(
+                  children: [
+                    
+                    IconButton(
+                      onPressed: () async {
+                        await signInWithGoogle();
+                      },
+                      
+                      icon: Image.asset(
+                        "images/ios_google.png",
+                        width: 50,
+                      ),
+                    ),
+                    Text(" 구글 아이디로 로그인",
+                      style: TextStyle(
+                      ),
+                    )
+                  ],
                 ),
               ],
             ),
