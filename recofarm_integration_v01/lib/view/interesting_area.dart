@@ -199,28 +199,30 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
               },
               icon: Icon(Icons.search_outlined))
         ],
-        title: PreferredSize(
-          preferredSize: Size.fromHeight(100),
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.7,
-            height: 60,
-            child: TextField(
-              textAlign: TextAlign.start,
-              decoration: const InputDecoration(
-                // alignLabelWithHint: true,
-                focusedBorder: UnderlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Color.fromARGB(255, 223, 117, 110))),
-                floatingLabelAlignment: FloatingLabelAlignment.start,
-                labelText: " 소재지 주소 검색",
-                labelStyle: TextStyle(
-                  color: Color.fromARGB(255, 235, 150, 31),
-                  shadows: CupertinoContextMenu.kEndBoxShadow,
-                  letterSpacing: 4,
-                  //textBaseline: TextBaseline.ideographic
+        title: SingleChildScrollView(
+          child: PreferredSize(
+            preferredSize: Size.fromHeight(100),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.7,
+              height: 60,
+              child: TextField(
+                textAlign: TextAlign.start,
+                decoration: const InputDecoration(
+                  // alignLabelWithHint: true,
+                  focusedBorder: UnderlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Color.fromARGB(255, 223, 117, 110))),
+                  floatingLabelAlignment: FloatingLabelAlignment.start,
+                  labelText: " 소재지 주소 검색",
+                  labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 235, 150, 31),
+                    shadows: CupertinoContextMenu.kEndBoxShadow,
+                    letterSpacing: 4,
+                    //textBaseline: TextBaseline.ideographic
+                  ),
                 ),
+                controller: locationTfController,
               ),
-              controller: locationTfController,
             ),
           ),
         ),

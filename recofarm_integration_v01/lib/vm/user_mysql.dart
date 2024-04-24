@@ -7,9 +7,10 @@ class UserMySQL extends GetxController {
 
   Future<List<UserArea>> areaList = Future(() => []);
 
-  int count = 0;
+    int count = 0;
 
   getAreaData(String userId) async {
+    count = 0;
     // areaList.clear();
     areaList.then((list) {
     list.clear(); // 리스트 비우기
@@ -41,8 +42,6 @@ class UserMySQL extends GetxController {
     if(count < 10) {
     update();
     }
-
-    count ++;
 
     // return areaList;
 

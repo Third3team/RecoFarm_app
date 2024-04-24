@@ -4,14 +4,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:new_recofarm_app/firebase_options.dart';
 import 'package:new_recofarm_app/view/find_my_password.dart';
-import 'package:new_recofarm_app/view/home_view_page.dart';
 import 'package:new_recofarm_app/view/interesting_area.dart';
 import 'package:new_recofarm_app/view/login_page.dart';
 import 'package:new_recofarm_app/view/my_area_list.dart';
 import 'package:new_recofarm_app/view/register_page.dart';
 import 'package:new_recofarm_app/view/splash_screen.dart';
-import 'package:new_recofarm_app/vm/user_mysql.dart';
-import 'package:provider/provider.dart';
 import 'view/home.dart';
 
 /*
