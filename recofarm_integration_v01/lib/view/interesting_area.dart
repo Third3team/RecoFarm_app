@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -11,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:latlong2/latlong.dart' as latlong;
 import 'package:new_recofarm_app/view/my_area_list.dart';
 import 'package:new_recofarm_app/view/myarea_edit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,6 +48,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
         - 지도에 마커 뜨도록 하는 기능 
           -> 마커 색상 변경
         - 롱탭하여 관심농지로 추가누르면 마커색이 빨간색으로 변함.  
+        - 현재위치로 돌아가는 floating action button 추가 
 
   Detail      : - 
 
@@ -110,6 +111,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   @override
   void initState() {
     super.initState();
+
     longTapCounter = 0;
 
     // selected area( long tap setting ) -> 선택한 지역의 마커는 페이지 실행될때마다 초기화 됨.
@@ -179,6 +181,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     _curPosGenCalcDistance();
     //print(" 현재위치의 위도 경도는 ${curLoc!.latitude}, ${curLoc!.latitude} 입니다 ");
     // 현재 위치  마커
+    _basicMarkershow();
   }
 
 ////////////////////// [Screen build] ////////////////////
@@ -249,8 +252,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                         child: CircularProgressIndicator(),
                       )
                     // Google map view
-                    : 
-                    Expanded(
+                    : Expanded(
                         flex: 2, // 화면 2분할
                         child: GoogleMap(
                             //mapType: MapType.normal,
@@ -292,6 +294,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                             onPressed: () {
                               // google map 이동
                               // Get.toNamed("/MyAreaList");
+
                               _showMyAreaActionSheet();
                             },
                             child: Text("내 경작지 보기"),
@@ -322,12 +325,79 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
           );
         },
       ),
+      floatingActionButton: Stack(
+        children: <Widget>[
+          Positioned(
+            top: 520,
+            right: -0,
+            child: FloatingActionButton(
+              
+              onPressed: () {
+            
+                _floatCurPos() async {
+                  var floatingCurPos = await Geolocator.getCurrentPosition();
+                  mapController.animateCamera(
+                    CameraUpdate.newCameraPosition(
+                      CameraPosition(
+                        target:
+                            LatLng(floatingCurPos.latitude, floatingCurPos.longitude),
+                        zoom: 14.4746,
+                      ),
+                    ),
+                  );
+                }
+                _floatCurPos();
+            
+                setState(() {});
+              },
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              child: const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.navigation),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   // Functions
 
   //2024.04.24 update
+
+  _predictAction(areaSize, myareaLat, myareaLng) async {
+    //double areaSize = 0;
+    //areaSize = double.parse(areaController.text);
+    double nearLat = 0;
+    print("예측시작");
+
+    nearLat = await nearLatLng(latlong.LatLng(myareaLat, myareaLng));
+
+      print(nearLat);
+
+    var url = Uri.parse(
+        'http://192.168.50.69:8080/predict?areaSize=${areaSize}&lat=$myareaLat&lng=$myareaLng&nearLat=$nearLat');
+    print(url);
+    var response = await http.readBytes(url);
+    double result = json.decode(utf8.decode(response));
+
+//    print("11");
+    Get.defaultDialog(
+        title: '결과',
+        middleText:
+            //"서버점검중입니다 \n 09:00~23:00", 
+            '예상 수확량은 ${result.toStringAsFixed(2)}톤 입니다.\n',
+        actions: [
+          ElevatedButton(onPressed: () => Get.back(), child: const Text('확인'))
+        ]);
+
+    //print(result.toString());
+  }
+
   _longTapSelectPosition(LatLng longTapPostion) {
     longTapCounter++;
     // 마커 추가
@@ -395,6 +465,15 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                         _insertMyArea(
                             interestLoc.latitude, interestLoc.longitude);
                         myareaMarkerList.add(findMarker);
+                        // Get.defaultDialog(
+                        //   middleText: "저장되었습니다.",
+                        //   actions: [
+                        //     ElevatedButton(
+                        //       onPressed: ()=>Get.back(),
+                        //       child: Text("ok"))
+                        //   ]
+
+                        // );
 
                         Get.back();
                       },
@@ -417,6 +496,23 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   }
 
   // 2024.04.23 Updated beloow
+
+  _basicMarkershow() {
+    List for_add = List.generate(myareaData.length, (index) {
+      Marker(
+          markerId: const MarkerId("현재위치"),
+          position: LatLng(
+              myareaData[index]['area_lat'], myareaData[index]['area_lng']),
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
+          infoWindow: const InfoWindow(
+            title: "현재위치 ",
+            snippet: "",
+          ));
+    });
+    selectedAreaMarker = (Set.from(for_add));
+  }
+
   _insertMyArea(curLat, curLng) async {
     // Desc : 내관심 소재지 mySQL DB 에서 정보 가져오는 함수
     // Update : 2024.04.22 by pdg
@@ -436,6 +532,16 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     //var dataConvertedJSON = json.decode(utf8.decode(response.bodyBytes));
     //List result = dataConvertedJSON;
     //myareaData.addAll(result);
+
+    // markers 추가 하기
+    selectedAreaMarker.add(Marker(
+      markerId: MarkerId(myareaProduct),
+      position: LatLng(curLat, curLng),
+      infoWindow: InfoWindow(title: '관심소재지'),
+      icon: BitmapDescriptor.defaultMarkerWithHue(
+          BitmapDescriptor.hueAzure), // 마커 아이콘 설정
+    ));
+
     setState(() {});
   }
 
@@ -451,11 +557,11 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   // 2024.04.22 Udated bellow
   // 내 소재지 정보 불러오는 함수 .
 
-
   _getMyareaJSONData() async {
     // Desc : 내관심 소재지 mySQL DB 에서 정보 가져오는 함수
     // Update : 2024.04.22 by pdg
     //  - 더조은 학원 IP address  :  192.168.50.69    String url_address = "http://localhost:8080/myarea?userId=$userId";
+
     String ip_database = "192.168.50.69";
     String url_address = "http://$ip_database:8080/myarea?userId=$userId";
     var url = Uri.parse(url_address);
@@ -465,108 +571,115 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     //print(response.body);
     var dataConvertedJSON = json.decode(utf8.decode(response.bodyBytes));
     List result = dataConvertedJSON;
+    myareaData = [];
     myareaData.addAll(result);
     setState(() {});
   }
 
   _showMyAreaActionSheet() {
+    // 이미 열려 있는 엑션 시트가 있는지 확인하고 있다면 닫기
+    List<Widget> myarea_view = List.empty();
+    print(myareaData.length);
     _getMyareaJSONData();
+    myarea_view = List.generate(
+      myareaData.length,
+      (index) => Slidable(
+        startActionPane: ActionPane(
+          motion: const BehindMotion(),
+          children: [
+            SlidableAction(
+              spacing: 1,
+              backgroundColor: const Color.fromARGB(255, 75, 152, 214),
+              icon: Icons.edit,
+              label: "수정",
+              onPressed: (context) {
+                Get.defaultDialog(
+                  content: MyAreaEdit(
+                      myareaSize: myareaData[index]['area_size'],
+                      myareaProduct: myareaData[index]['area_product']),
+                );
+                print("수정 슬라이드 ");
+              },
+            )
+          ],
+        ),
+        endActionPane: ActionPane(
+          motion: StretchMotion(),
+          children: [
+            SlidableAction(
+              onPressed: (context) {},
+              backgroundColor: const Color.fromARGB(255, 211, 94, 86),
+              icon: Icons.edit,
+              label: "삭제",
+            )
+          ],
+        ),
+        child: CupertinoActionSheetAction(
+          onPressed: () {
+            print("clicked");
+            // 해당 위치로 이동하기
+            _gotoSelectedLoc(index);
+            Get.back();
+          },
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${index + 1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})'
+                              .length >
+                          20
+                      ? '${index + 1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})'
+                              .substring(0, 20) +
+                          "..."
+                      : '${index + 1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})',
+                  style: TextStyle(fontSize: 15),
+                ),
+                SizedBox(
+                  width: 120,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // 생산량 예측 함수
+                      _predictAction(
+                        myareaData[index]['area_size'],
+                        myareaData[index]['area_lat'],
+                        myareaData[index]['area_lng'],
+                      );
+                    },
+                    child: const Text(
+                      "생산량 예측하기",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
     showCupertinoModalPopup(
       semanticsDismissible: true,
       context: context,
       builder: (context) {
         return GestureDetector(
-            onTap: () => FocusScope.of(context).unfocus(),
             child: GestureDetector(
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: CupertinoActionSheet(
-                messageScrollController: ScrollController(),
-                message: SingleChildScrollView(
-                  controller: ScrollController(),
-                  child: Column(
-                      //children: [],
-                      ),
-                ),
-                title: const Text("내 경작지 리스트"),
-                actions: List.generate(
-                  myareaData.length,
-                  (index) => Slidable(
-                    startActionPane: ActionPane(
-                      motion: const BehindMotion(),
-                      children: [
-                        SlidableAction(
-                          spacing: 1,
-                          backgroundColor:
-                              const Color.fromARGB(255, 75, 152, 214),
-                          icon: Icons.edit,
-                          label: "수정",
-                          onPressed: (context) {
-                            Get.defaultDialog(
-                              content: MyAreaEdit(
-                                  myareaSize: myareaData[index]['area_size'],
-                                  myareaProduct: myareaData[index]
-                                      ['area_product']),
-                            );
-                            print("수정 슬라이드 ");
-                          },
-                        )
-                      ],
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: CupertinoActionSheet(
+              messageScrollController: ScrollController(),
+              message: SingleChildScrollView(
+                controller: ScrollController(),
+                child: Column(
+                    //children: [],
                     ),
-                    endActionPane: ActionPane(
-                      motion: StretchMotion(),
-                      children: [
-                        SlidableAction(
-                          onPressed: (context) {},
-                          backgroundColor:
-                              const Color.fromARGB(255, 211, 94, 86),
-                          icon: Icons.edit,
-                          label: "삭제",
-                        )
-                      ],
-                    ),
-                    child: CupertinoActionSheetAction(
-                      onPressed: () {
-                        print("clicked");
-                        // 해당 위치로 이동하기
-                        _gotoSelectedLoc(index);
-                        Get.back();
-                      },
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '${index + 1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})'
-                                          .length >
-                                      20
-                                  ? '${index + 1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})'
-                                          .substring(0, 20) +
-                                      "..."
-                                  : '${index + 1} . ${myareaData[index]['area_address']}(${myareaData[index]['area_product']})',
-                              style: TextStyle(fontSize: 15),
-                            ),
-                            SizedBox(
-                              width: 120,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  // 생산량 예측 함수 
-                                  
-                                },
-                                child: const Text(
-                                  "생산량 예측하기",
-                                  style: TextStyle(fontSize: 20),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
               ),
-            ));
+              title: const Text("내 경작지 리스트"),
+              actions: myarea_view),
+        ));
 
         //MyAreaList();
       },
@@ -590,9 +703,8 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     );
   }
 
-
   _addMyAreaDialog() {
-    // Desc : 현재 위치를 관심 소재지로 추가하는 함수 
+    // Desc : 현재 위치를 관심 소재지로 추가하는 함수
     // Date : 2024.04.24 by pdg
     Get.defaultDialog(
       barrierDismissible: true,
@@ -607,6 +719,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
           },
           child: Text("예"),
         ),
+        SizedBox(width: 10,),
         ElevatedButton(onPressed: () => Get.back(), child: Text("아니오")),
       ],
     );
@@ -794,4 +907,46 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     // 위의 모든 조건이 통과되면 위치 권한 허가 가 완료 된것임.
     return "위치 권한이 허가 되었습니다.";
   }
+
+
+  
+  nearLatLng(originalLatLng) {
+
+    List<Map> placeListLocation = [
+    { 'lat' : 37.2343060386837, 'lng' : 127.201357139725,}, // '경기도 용인시 처인구',
+    { 'lat' : 36.3622851114392, 'lng' : 127.356257593324,}, // '대전광역시 유성구',
+    { 'lat' : 36.8153571576607, 'lng' : 127.786652163107,}, //  '충청북도 괴산군',
+    { 'lat' : 36.9910490160221, 'lng' : 127.925961035784,}, // '충청북도 충주시',
+    { 'lat' : 36.855378991826, 'lng' : 127.435536085976,}, // '충청북도 진천군',
+    { 'lat' : 35.5698491739949, 'lng' : 126.8560,}, // '전라북도 정읍시',
+    { 'lat' : 35.7316577924649, 'lng' : 126.7330,}, //  '전라북도 부안군',
+    { 'lat' : 34.6420615268858, 'lng' : 126.7672,}, //  '전라남도 강진군',
+    { 'lat' : 34.486828620348, 'lng' : 126.2634,}, // '전라남도 진도군',
+    { 'lat' : 34.5735165884839, 'lng' : 126.5993,}, //  '전라남도 해남군',
+    { 'lat' : 36.0437417308541, 'lng' : 129.3686,}, //  '경상북도 포항시 북구',
+    { 'lat' : 36.4150618798074, 'lng' : 129.3653,}, // '경상북도 영덕군',
+    { 'lat' : 36.6667028574142, 'lng' : 129.1125,}, // '경상북도 영양군',
+    { 'lat' : 35.2285653558628, 'lng' : 128.8894,}, // '경상남도 김해시',
+    { 'lat' : 34.8544448244005, 'lng' : 128.4331,}, //  '경상남도 통영시',
+  ];
+  
+    double nearLat = 0;
+    
+    latlong.Haversine haverCalc = latlong.Haversine();
+
+    double nearDistance = haverCalc.distance(originalLatLng, latlong.LatLng(placeListLocation[0]['lat'], placeListLocation[0]['lng']));
+
+    print(nearDistance);
+
+    for(int j=0; j<placeListLocation.length; j++) {
+      if(nearDistance > haverCalc.distance(originalLatLng, latlong.LatLng(placeListLocation[j]['lat'], placeListLocation[j]['lng']))) {
+        nearDistance = haverCalc.distance(originalLatLng, latlong.LatLng(placeListLocation[j]['lat'], placeListLocation[j]['lng']));
+        nearLat = placeListLocation[j]['lat'];
+        print(nearLat);
+      }
+    }
+    // update();
+    return nearLat;
+  }
+
 } // END
