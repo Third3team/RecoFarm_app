@@ -61,7 +61,7 @@ class InterestingAreaPage extends StatefulWidget {
 
 class _InterestingAreaPageState extends State<InterestingAreaPage> {
   // properties
-  late int longTapCounter ;
+  late int longTapCounter;
 
   late int currentLocGetCallCount;
   late TextEditingController locationTfController;
@@ -110,9 +110,9 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   @override
   void initState() {
     super.initState();
-    longTapCounter=0;
+    longTapCounter = 0;
 
-    // selected area( long tap setting ) -> 선택한 지역의 마커는 페이지 실행될때마다 초기화 됨. 
+    // selected area( long tap setting ) -> 선택한 지역의 마커는 페이지 실행될때마다 초기화 됨.
     selectedAreaMarker = {};
 
     // 현재위치 파악
@@ -240,21 +240,21 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
             ///----------------------------------<< Screen 화면 >>------------------------------------------
             return Column(
               children: [
-                Text("길게 눌러서 지역을 선택하세요",
-                        style: TextStyle(
-                          color: Colors.purple,
-                          fontSize: 20
-                        ),
-                      ),
-
+                Text(
+                  "길게 눌러서 지역을 선택하세요",
+                  style: TextStyle(color: Colors.purple, fontSize: 20),
+                ),
                 curLoc == null
                     ? Center(
                         child: CircularProgressIndicator(),
                       )
                     // Google map view
-                    : Expanded(
+                    : 
+                    Expanded(
                         flex: 2, // 화면 2분할
                         child: GoogleMap(
+                            //mapType: MapType.normal,
+                            //buildingsEnabled: true,
                             onLongPress: (postion) =>
                                 _longTapSelectPosition(postion),
                             initialCameraPosition: CameraPosition(
@@ -262,10 +262,15 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                               target: curLoc!,
                               zoom: 14.4746,
                             ),
-                            myLocationButtonEnabled: true,
+                            // myLocationButtonEnabled: true,
+                            // compassEnabled: true,
+                            // zoomGesturesEnabled: true,
+                            // rotateGesturesEnabled: true,
+                            // mapToolbarEnabled: true,
+                            //gestureRecognizers: ,
                             // 마커와 내 반경 설정
-                            markers: Set.from(
-                                selectedAreaMarker), //Set.from([curLocMarker],),
+                            markers:
+                                selectedAreaMarker, //Set.from([curLocMarker],),
                             circles: Set.from([myAreaCircle]),
 
                             // controller setting
@@ -276,7 +281,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       //const Text("내 관심 경작지 리스트(combo box)"),
-                      
+
                       Text(searchedAddress),
 
                       Text("관심 지역까지 거리 : ${distance1.toStringAsFixed(2)} km"),
@@ -346,8 +351,8 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     // 마커 세트 업데이트
     selectedAreaMarker.add(newMarker);
     setState(() {});
-    // 소재지 정보 업데이트 
-    getPlaceAddress(longTapPostion.latitude, longTapPostion.longitude); 
+    // 소재지 정보 업데이트
+    getPlaceAddress(longTapPostion.latitude, longTapPostion.longitude);
   }
 
   // 2024.04.23 updated
@@ -445,6 +450,8 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
 
   // 2024.04.22 Udated bellow
   // 내 소재지 정보 불러오는 함수 .
+
+
   _getMyareaJSONData() async {
     // Desc : 내관심 소재지 mySQL DB 에서 정보 가져오는 함수
     // Update : 2024.04.22 by pdg
@@ -463,6 +470,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
   }
 
   _showMyAreaActionSheet() {
+    _getMyareaJSONData();
     showCupertinoModalPopup(
       semanticsDismissible: true,
       context: context,
@@ -539,12 +547,15 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
                               style: TextStyle(fontSize: 15),
                             ),
                             SizedBox(
-                              width: 50,
+                              width: 120,
                               child: ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  // 생산량 예측 함수 
+                                  
+                                },
                                 child: const Text(
-                                  "예측",
-                                  style: TextStyle(fontSize: 15),
+                                  "생산량 예측하기",
+                                  style: TextStyle(fontSize: 20),
                                 ),
                               ),
                             )
@@ -579,11 +590,14 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
     );
   }
 
+
   _addMyAreaDialog() {
+    // Desc : 현재 위치를 관심 소재지로 추가하는 함수 
+    // Date : 2024.04.24 by pdg
     Get.defaultDialog(
       barrierDismissible: true,
       title: "관심소재지 등록",
-      middleText: " $myareaAddress를 관심 소재지로 등록하시겠습니까?",
+      middleText: " $searchedAddress 관심 소재지로 등록하시겠습니까?",
       actions: [
         ElevatedButton(
           onPressed: () {
@@ -715,7 +729,7 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
             snippet: "",
           ));
       print(" 현재위치가 설정되었습니다 ");
-      
+
       var findAddressUri = Uri.parse(
           'https://maps.googleapis.com/maps/api/geocode/json?latlng=${curPosition.latitude},${curPosition.longitude}&language=ko&key=AIzaSyDslR-okT6JXHWhMmrOXaNxXhA6C0LxJHo');
 
@@ -724,20 +738,18 @@ class _InterestingAreaPageState extends State<InterestingAreaPage> {
       //print(responseFAU.body)
       // Json data convert
       setState(() {
-      var dataCovertedJSON = json.decode(utf8.decode(responseFAU.bodyBytes));
+        var dataCovertedJSON = json.decode(utf8.decode(responseFAU.bodyBytes));
 
-      List address_result = dataCovertedJSON['results'];
-      // Formatted address 를 업데이트
-      searchedAddress = address_result[0]['formatted_address'];
-      //print(address_result);
-      // 검색한 주소로 맵의 위치가 이동하면서 관심 지역 위도 경도 변수가 업데이트 된다.
-      interestLoc = LatLng(address_result[0]['geometry']['location']['lat'],
-          address_result[0]['geometry']['location']['lng']);
-      // data.addAll(result);
-      // 나의 주소 <- 검색한주소 : 변경 필요
-      myareaAddress = searchedAddress;
-     
-        
+        List address_result = dataCovertedJSON['results'];
+        // Formatted address 를 업데이트
+        searchedAddress = address_result[0]['formatted_address'];
+        //print(address_result);
+        // 검색한 주소로 맵의 위치가 이동하면서 관심 지역 위도 경도 변수가 업데이트 된다.
+        interestLoc = LatLng(address_result[0]['geometry']['location']['lat'],
+            address_result[0]['geometry']['location']['lng']);
+        // data.addAll(result);
+        // 나의 주소 <- 검색한주소 : 변경 필요
+        myareaAddress = searchedAddress;
       });
     }
   }
