@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:new_recofarm_app/view/login_page.dart';
 import 'package:new_recofarm_app/view/predict_yield.dart';
+import 'package:new_recofarm_app/view/web_view_page.dart';
 import 'package:new_recofarm_app/vm/user_firebase.dart';
 
 class DrawerWidget extends StatelessWidget {
@@ -29,7 +30,7 @@ class DrawerWidget extends StatelessWidget {
           if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
             userName = snapshot.data!.docs[0]['userName'] ??
                 FirebaseAuth.instance.currentUser?.displayName;
-            userEmail = snapshot.data!.docs[0]['userEmail'] ??
+            userEmail = snapshot.data!.docs[0]['userId'] ??
                 FirebaseAuth.instance.currentUser?.email;
           } else {
             // 데이터가 없을 경우의 기본값 설정
@@ -41,7 +42,7 @@ class DrawerWidget extends StatelessWidget {
             children: [
               UserAccountsDrawerHeader(
                 currentAccountPicture: const CircleAvatar(
-                  backgroundColor: Colors.amber,
+                  backgroundColor: Colors.white,
                 ),
                 accountName: Padding(
                   padding: const EdgeInsets.fromLTRB(6, 30, 0, 0),
@@ -107,8 +108,10 @@ class DrawerWidget extends StatelessWidget {
                   Icons.question_answer,
                   color: Colors.orange,
                 ),
-                title: const Text('공지사항'),
-                onTap: () => {print('home')},
+                title: const Text('농넷 바로가기'),
+                onTap: () {
+                  Get.to(WebViewPage());
+                },
               ),
               ListTile(
                 leading: const Icon(

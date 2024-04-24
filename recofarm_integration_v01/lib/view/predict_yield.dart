@@ -2,8 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:new_recofarm_app/view/predict_price.dart';
 import 'package:new_recofarm_app/vm/vmpredict_yield.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PredictYield extends StatelessWidget {
   PredictYield({super.key});
@@ -234,6 +237,8 @@ class PredictYield extends StatelessWidget {
         ),
         ElevatedButton(
           onPressed: () {
+            // vmPredictController.nearLatLng(LatLng(35.123456, 127.12345));
+            // print(vmPredictController.nearLat);
             predictAction();
           },
           child: const Text('확인')
@@ -251,22 +256,28 @@ class PredictYield extends StatelessWidget {
       areaSize = areaSize * 3.3;
     }
 
-    var url = Uri.parse('http://localhost:8080/predict?areaSize=${areaSize}&lat=${vmPredictController.latData}&lng=${vmPredictController.lngData}');
+    var url = Uri.parse('http://192.168.50.69:8080/predict?areaSize=${areaSize}&lat=${vmPredictController.latData}&lng=${vmPredictController.lngData}');
     var response = await http.readBytes(url);
     double result = json.decode(utf8.decode(response));
+
+    SharedPreferences ref = await SharedPreferences.getInstance();
+    print('결과 $result');
+    ref.setDouble('predict', result);
 
     Get.defaultDialog(
       title: '결과',
       middleText: '예상 수확량은 ${result.toStringAsFixed(2)}톤 입니다.\n',
       actions: [
         ElevatedButton(
-          onPressed: () => Get.back(),
+          onPressed: () {
+            Get.back();
+            Get.back();
+            Get.to(const Predict_Price());
+          },
           child: const Text('확인')
         )
       ]
     );
-
-    print(result.toString());
   }
 
   errorSnackBar(context, String text) {
