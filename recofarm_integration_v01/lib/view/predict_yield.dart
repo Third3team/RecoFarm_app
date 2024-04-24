@@ -21,9 +21,7 @@ class PredictYield extends StatelessWidget {
         backgroundColor: Colors.amber[100],
         title: const Text(
           '수확량 예측하기',
-          style: TextStyle(
-            fontSize: 35
-          ),
+          style: TextStyle(fontSize: 35),
         ),
       ),
       body: SingleChildScrollView(
@@ -40,7 +38,8 @@ class PredictYield extends StatelessWidget {
                         child: RadioListTile(
                           value: false,
                           groupValue: vmPredictController.unitGroupValue,
-                          onChanged: (value) => vmPredictController.selectUnitRadio(value),
+                          onChanged: (value) =>
+                              vmPredictController.selectUnitRadio(value),
                           title: const Text('평수'),
                         ),
                       ),
@@ -49,7 +48,8 @@ class PredictYield extends StatelessWidget {
                         child: RadioListTile(
                           value: true,
                           groupValue: vmPredictController.unitGroupValue,
-                          onChanged: (value) => vmPredictController.selectUnitRadio(value),
+                          onChanged: (value) =>
+                              vmPredictController.selectUnitRadio(value),
                           title: const Text('제곱미터'),
                         ),
                       ),
@@ -62,14 +62,10 @@ class PredictYield extends StatelessWidget {
                 child: TextField(
                   controller: areaController,
                   decoration: const InputDecoration(
-                    hintText: '면적을 입력해주세요!',
-                    hintStyle: TextStyle(
-                      fontSize: 25
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20))
-                    )
-                  ),
+                      hintText: '면적을 입력해주세요!',
+                      hintStyle: TextStyle(fontSize: 25),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20)))),
                 ),
               ),
               Padding(
@@ -94,7 +90,7 @@ class PredictYield extends StatelessWidget {
                               groupValue: controller.groupValue,
                               onChanged: (value) {
                                 controller.selectRadio(value);
-                              }, 
+                              },
                               title: const Text('검색'),
                             ),
                           ),
@@ -115,7 +111,7 @@ class PredictYield extends StatelessWidget {
                       OutlinedButton.icon(
                         onPressed: () {
                           controller.placeSearchAction(context);
-                        } ,
+                        },
                         icon: const Icon(Icons.search),
                         label: Text(controller.buttonText),
                       ),
@@ -125,7 +121,8 @@ class PredictYield extends StatelessWidget {
                           width: 300,
                           height: 50,
                           child: Visibility(
-                            visible: vmPredictController.selectAreaPlaceName.isNotEmpty,
+                            visible: vmPredictController
+                                .selectAreaPlaceName.isNotEmpty,
                             child: Text(
                               '선택된 지역 : ${vmPredictController.selectAreaPlaceName}',
                               textAlign: TextAlign.center,
@@ -146,20 +143,19 @@ class PredictYield extends StatelessWidget {
                 ),
               ),
               ElevatedButton(
-                onPressed: () {
-                  // 면적을 입력 안했을 때
-                  if(areaController.text == '') {
-                    errorSnackBar(context, '면적을 입력해주세요!');
-                    return;
-                  }
-                  if(vmPredictController.selectAreaPlaceName == '') {
-                    errorSnackBar(context, '지역을 선택해주세요!');
-                    return;
-                  }
-                  confirmDialog(context);                
-                },
-                child: const Text('예측해보기')
-              )
+                  onPressed: () {
+                    // 면적을 입력 안했을 때
+                    if (areaController.text == '') {
+                      errorSnackBar(context, '면적을 입력해주세요!');
+                      return;
+                    }
+                    if (vmPredictController.selectAreaPlaceName == '') {
+                      errorSnackBar(context, '지역을 선택해주세요!');
+                      return;
+                    }
+                    confirmDialog(context);
+                  },
+                  child: const Text('예측해보기'))
             ],
           ),
         ),
@@ -169,67 +165,55 @@ class PredictYield extends StatelessWidget {
 
   confirmDialog(context) {
     Get.defaultDialog(
-      title: '확인',
-      content: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  '면적은 ',
-                  style: TextStyle(
-                    fontSize: 24
+        title: '확인',
+        content: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    '면적은 ',
+                    style: TextStyle(fontSize: 24),
                   ),
-                ),
-                Text(
-                  '${areaController.text} ',
-                  style: const TextStyle(
-                    color: Colors.red
+                  Text(
+                    '${areaController.text} ',
+                    style: const TextStyle(color: Colors.red),
                   ),
-                ),
-                Text(
-                  // '제곱미터이고,',
-                  '${!vmPredictController.unitGroupValue! ? '평' : '제곱미터'}',
-                  style: const TextStyle(
-                    fontSize: 24
+                  Text(
+                    // '제곱미터이고,',
+                    '${!vmPredictController.unitGroupValue! ? '평' : '제곱미터'}',
+                    style: const TextStyle(fontSize: 24),
                   ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  '선택된 지역은 ',
-                  style: TextStyle(
-                    fontSize: 24
-                  ),
-                ),
-                Text(
-                  '${vmPredictController.selectAreaPlaceName} ',
-                  style: const TextStyle(
-                    color: Colors.red
-                  ),
-                ),
-                // const Text(
-                //   '에서',
-                //   style: TextStyle(
-                //     fontSize: 24
-                //   ),
-                // ),
-              ],
-            ),
-            const Text(
-              '\n예상 수확량을 알아보기',
-              style: TextStyle(
-                fontSize: 24
+                ],
               ),
-            ),
-          ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    '선택된 지역은 ',
+                    style: TextStyle(fontSize: 24),
+                  ),
+                  Text(
+                    '${vmPredictController.selectAreaPlaceName} ',
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  // const Text(
+                  //   '에서',
+                  //   style: TextStyle(
+                  //     fontSize: 24
+                  //   ),
+                  // ),
+                ],
+              ),
+              const Text(
+                '\n예상 수확량을 알아보기',
+                style: TextStyle(fontSize: 24),
+              ),
+            ],
+          ),
         ),
-      ),
       actions: [
         ElevatedButton(
           onPressed: () => Get.back(),
@@ -252,7 +236,7 @@ class PredictYield extends StatelessWidget {
     double areaSize = 0;
     areaSize = double.parse(areaController.text);
 
-    if(!vmPredictController.unitGroupValue!) {
+    if (!vmPredictController.unitGroupValue!) {
       areaSize = areaSize * 3.3;
     }
 
@@ -281,13 +265,9 @@ class PredictYield extends StatelessWidget {
   }
 
   errorSnackBar(context, String text) {
-    Get.snackbar(
-      '경고',
-      '면적을 입력해주세요!',
-      titleText: const Text('경고'),
-      messageText: Text('$text'),
-      backgroundColor: Theme.of(context).colorScheme.errorContainer
-    );
+    Get.snackbar('경고', '면적을 입력해주세요!',
+        titleText: const Text('경고'),
+        messageText: Text('$text'),
+        backgroundColor: Theme.of(context).colorScheme.errorContainer);
   }
-  
 }
