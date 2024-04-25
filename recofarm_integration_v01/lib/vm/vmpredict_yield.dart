@@ -2,12 +2,25 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 
+/*
+  Description : yield prediction view model
+  Date        : 2024.04.25 Thr
+  Author      : LCY 
+  Updates     : 
+	  2024.04.25 Thr by pdg
+		  -  code review :: 주석 
+  Detail      : - 
+
+*/
+
 class VMpredict extends GetxController{
 
+  // radio button values
   bool? unitGroupValue = true;
   bool? groupValue = true;
-
+  // 검색지역 선택 여부
   bool searchAreaValue = false;
+  // 선택 한 지역 
   bool selecteAreaValue = true;
 
   String buttonText = '지역 선택';
@@ -21,6 +34,7 @@ class VMpredict extends GetxController{
   double nearLat = 0;
   // double naerLng = 0;
 
+  // 기후  지역 List -> my SQL db 에 넣을 것. 
   List<String> placeList = [
     '경기도 용인시 처인구',
     '대전광역시 유성구',

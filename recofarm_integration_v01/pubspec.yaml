@@ -131,7 +131,12 @@ flutter:
         - asset: assets/fonts/Sunflower-Light.ttf
         - asset: assets/fonts/Sunflower-Medium.ttf
           weight : 700
-
+    - family: cookieRun
+      fonts:
+        - asset: assets/fonts/cookieRun/CookieRunBlack.ttf
+        - asset: assets/fonts/cookieRun/CookieRunBold.ttf
+        - asset: assets/fonts/cookieRun/CookieRunRegular.ttf
+          weight : 100
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
