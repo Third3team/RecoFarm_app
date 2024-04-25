@@ -61,12 +61,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // UI font family 설정  => Dongle
-        fontFamily: 'Dongle',
+        fontFamily: 'cookieRun',
         textTheme: const TextTheme(
-          labelLarge: TextStyle(fontSize: 30),
-          bodyLarge: TextStyle(fontSize: 30),
-          bodySmall: TextStyle(fontSize: 30),
-          bodyMedium: TextStyle(fontSize: 30),
+          labelLarge: TextStyle(fontSize: 15),
+          bodyLarge: TextStyle(fontSize: 15),
+          bodySmall: TextStyle(fontSize: 10),
+          bodyMedium: TextStyle(fontSize: 15),
         ),
         colorScheme: ColorScheme.fromSeed(
             seedColor: const Color.fromARGB(255, 233, 172, 30)),

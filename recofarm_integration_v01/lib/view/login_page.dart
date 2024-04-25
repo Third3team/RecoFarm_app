@@ -54,15 +54,15 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        title: Text(
-          '로그인',
-          style: TextStyle(
-              fontSize: 50,
-              color: Theme.of(context).colorScheme.onPrimaryContainer),
-        ),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      //   title: Text(
+      //     '로그인',
+      //     style: TextStyle(
+      //         // fontSize: 50,
+      //         color: Theme.of(context).colorScheme.onPrimaryContainer),
+      //   ),
+      // ),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -72,7 +72,7 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20.0),
+                  const SizedBox(height: 100.0),
                   Image.asset(
                     "images/farmer.png",
                     height: 200,
@@ -132,7 +132,7 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                                         flex: 3,
                                         child: TextFormField(
                                           style: const TextStyle(
-                                            fontSize: 25,
+                                            //fontSize: 25,
                                           ),
                                           decoration: const InputDecoration(
                                             contentPadding:
@@ -166,7 +166,7 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                                         flex: 3,
                                         child: TextFormField(
                                           style: const TextStyle(
-                                            fontSize: 25,
+                                            //fontSize: 25,
                                           ),
                                           decoration: const InputDecoration(
                                             contentPadding:
@@ -206,7 +206,7 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                                         flex: 3,
                                         child: TextFormField(
                                           style: const TextStyle(
-                                            fontSize: 25,
+                                            // fontSize: 25,
                                           ),
                                           decoration: const InputDecoration(
                                             contentPadding:
@@ -306,7 +306,7 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                         toastLength: Toast.LENGTH_SHORT,
                         timeInSecForIosWeb: 1,
                         backgroundColor: Colors.red,
-                        fontSize: 16.0,
+                        // fontSize: 16.0,
                       );
                       return;
                     }
