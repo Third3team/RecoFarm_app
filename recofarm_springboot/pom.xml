@@ -21,14 +21,13 @@
 		* Date : 2024.04.19
 		* Author : pdg
 		* Update : 	
-			1. Recofarm Web spring API  를 위한 porm 설
-		
-	
+			1. Recofarm Web spring API  를 위한 porm 설치 
+			2024.04.25 by pdg	
+				- Rserve part 주석 추가 
 	-->
 	
-	
-	
 	<dependencies>
+		<!-- Rserve를 돌리기 위한 dependecy  -->
 		<dependency>
 		    <groupId>org.rosuda.REngine</groupId>
 		    <artifactId>REngine</artifactId>

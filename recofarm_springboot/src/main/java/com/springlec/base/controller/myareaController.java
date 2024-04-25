@@ -59,8 +59,12 @@ public class myareaController {
 		 double areaSize = Double.parseDouble(request.getParameter("areaSize"));
 		    double lat = Double.parseDouble(request.getParameter("lat"));
 		    double lng = Double.parseDouble(request.getParameter("lng"));
+		    double nearLat = Double.parseDouble(request.getParameter("nearLat"));
+		    
+		    System.out.println("nearLat 값 : "+ nearLat);
 		 
 		    RConnection conn = new RConnection();
+		    
 //		    conn.voidEval("library(Rserve)");
 //		    conn.voidEval("Rserve(FALSE, port=6311, args = '--RS-encoding utf8 --no-save')");
 		    
@@ -69,7 +73,7 @@ public class myareaController {
 		    conn.voidEval("library(randomForest)");
 
 		    conn.voidEval("data <- read.csv('/Library/Tomcat/webapps/ROOT/Flutter/Project_Rserve/predict_weather.csv')");
-		    conn.voidEval("data <- data[data$lat == " + lat +",][1,]");
+		    conn.voidEval("data <- data[data$lat == " + nearLat +",][1,]");
 
 		    conn.voidEval("rf <- readRDS('/Library/Tomcat/webapps/ROOT/Flutter/Project_Rserve/rf_recoFarm_product_model_ver1.rds')");
 		    
