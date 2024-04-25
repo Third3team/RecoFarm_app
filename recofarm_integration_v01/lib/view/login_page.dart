@@ -196,10 +196,10 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                               // 간편 로그인 Form
                               Column(
                                 children: [
-                                  const SizedBox(height: 10),
+                                  const SizedBox(height: 50),
                                   Row(
                                     children: [
-                                      const Text("간편비밀번호   "),
+                                      const Text(""),
                                       Expanded(
                                         flex: 3,
                                         child: TextFormField(
@@ -209,8 +209,8 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                                           decoration: const InputDecoration(
                                             contentPadding:
                                                 EdgeInsets.symmetric(
-                                                    vertical: 10.0,
-                                                    horizontal: 10.0),
+                                                    vertical: 20.0,
+                                                    horizontal: 20.0),
                                             isDense: true,
                                             hintText: "간편 비밀번호를 입력하세요.",
                                             enabledBorder: OutlineInputBorder(
