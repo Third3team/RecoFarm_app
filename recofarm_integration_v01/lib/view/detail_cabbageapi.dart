@@ -131,7 +131,7 @@ class _DetailCabbageState extends State<DetailCabbage> {
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 50,
               ),
               GetBuilder<NapaCabbageAPI>(
@@ -177,7 +177,7 @@ class _DetailCabbageState extends State<DetailCabbage> {
               );
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 height: 50,
               ),
               Padding(
@@ -269,7 +269,7 @@ class _DetailCabbageState extends State<DetailCabbage> {
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 50,
               ),
             ],
@@ -314,6 +314,7 @@ class _DetailCabbageState extends State<DetailCabbage> {
     );
   }
 
+  // 데이터를 불러올때, 데이터를 아직 다 불러오지 못했다면 Dialog를 통해 행동 제한
   loadAction() async {
     loadingDialog(true);
     await chartXmlData('${chosenDateTime.year}${chosenDateTime.month.toString().padLeft(2, '0')}${chosenDateTime.day.toString().padLeft(2,'0')}');
@@ -321,9 +322,10 @@ class _DetailCabbageState extends State<DetailCabbage> {
     setState(() {});
   }
 
+  // 배추 거래량 API
   Future<void> chartXmlData(String date) async {
 
-    print('입력 날짜 : $date');
+    // print('입력 날짜 : $date');
     chartApiModel.clear();
     double parseDate = double.parse(date) - 7;
 
@@ -332,6 +334,7 @@ class _DetailCabbageState extends State<DetailCabbage> {
       final url = Uri.parse('http://211.237.50.150:7080/openapi/b2c4c81d3e3b685b913bd27e183618c306a179d340cb05593d06ace9746b6270/xml/Grid_20220817000000000620_1/1/10?DATES=${parseDate.toString().substring(0,8)}&MCLASSNAME=배추&MARKETNAME=서울가락도매');
       final response = await http.get(url);
 
+      // 해당 일자의 전체 거래 무게
       double allWeight = 0;
 
       if (response.statusCode == 200) {
@@ -344,18 +347,25 @@ class _DetailCabbageState extends State<DetailCabbage> {
         if(items.isNotEmpty) {
           
           for (final item in items) {
+            // 단위와 무게
             final weight = item.findElements('UNITNAME').single.innerText;
+            // 거래 개수
             final sumAmt = item.findElements('SUMAMT').single.innerText;
 
+            // 10kg 17개와 같이 단위와 개수가 함께 존재함.
             List<String> parts = weight.split(' ');
+            // 10kg 에서, 숫자만 뽑기 위한 정규식
             RegExp regex = RegExp(r'\d+(\.\d+)?');
             Match? match = regex.firstMatch(parts[0]);
             if(match != null) {
+              // 정규식을 통해 숫자만 뽑아온 String을 Double로 변환
               double weigh1t = double.parse(match.group(0)!);
+              // 거래량 합산
               allWeight += weigh1t * double.parse(sumAmt);
             }
           }
 
+          // 데이터 추가
           chartApiModel.add({
             'date' : parseDate,
             'allWeight' : allWeight
@@ -365,26 +375,28 @@ class _DetailCabbageState extends State<DetailCabbage> {
         }
 
       }else {
-        print('Failed to fetch XML data: ${response.statusCode}');
+        print('실패 : ${response.statusCode}');
       }
       parseDate = parseDate + 1;
       print('끝 : ${parseDate}');
     }
 
+    // 데이터를 추가하지 않았다면, 즉 데이터가 없다면
     if(chartApiModel.isEmpty) {
-      print('dataisEmpty\!');
+      // print('dataisEmpty!');
       // Get.back();
       await noDataDialog();
       return;
     }
-     
+    
+    // 데이터가 있다면, 원래 있던 데이터 정리
     chartData.clear();
 
-    // maximumY = 0;
+    // for문을 통해 데이터 추가
     for(int i=0; i<chartApiModel.length; i++) {
       print('length: ${chartApiModel.length}');
 
-      chartApiModel[i]['allWeight']!.round();
+      // chartApiModel[i]['allWeight']!.round();
       chartData.add(
         ChartModel(date: int.parse(chartApiModel[i]['date'].toString().substring(0,8)), weight: chartApiModel[i]['allWeight']!.round())
       );
