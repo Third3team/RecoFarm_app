@@ -1,13 +1,12 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:new_recofarm_app/view/predict_price.dart';
 import 'package:new_recofarm_app/vm/vmpredict_yield.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+// ignore: must_be_immutable
 class PredictYield extends StatelessWidget {
   PredictYield({super.key});
 
@@ -149,6 +148,7 @@ class PredictYield extends StatelessWidget {
                       errorSnackBar(context, '면적을 입력해주세요!');
                       return;
                     }
+                    // 지역을 선택하지 않았을때,
                     if (vmPredictController.selectAreaPlaceName == '') {
                       errorSnackBar(context, '지역을 선택해주세요!');
                       return;
@@ -183,7 +183,7 @@ class PredictYield extends StatelessWidget {
                   ),
                   Text(
                     // '제곱미터이고,',
-                    '${!vmPredictController.unitGroupValue! ? '평' : '제곱미터'}',
+                    !vmPredictController.unitGroupValue! ? '평' : '제곱미터',
                     style: const TextStyle(fontSize: 24),
                   ),
                 ],
@@ -196,15 +196,9 @@ class PredictYield extends StatelessWidget {
                     style: TextStyle(fontSize: 24),
                   ),
                   Text(
-                    '${vmPredictController.selectAreaPlaceName} ',
+                    vmPredictController.selectAreaPlaceName,
                     style: const TextStyle(color: Colors.red),
                   ),
-                  // const Text(
-                  //   '에서',
-                  //   style: TextStyle(
-                  //     fontSize: 24
-                  //   ),
-                  // ),
                 ],
               ),
               const Text(
@@ -231,22 +225,29 @@ class PredictYield extends StatelessWidget {
     );
   }
 
-  // function
+  // 예측 API
   predictAction() async {
+    // 입력한 면적
     double areaSize = 0;
     areaSize = double.parse(areaController.text);
 
+    // 평수를 입력하였을떄,
     if (!vmPredictController.unitGroupValue!) {
+      // 제곱미터로 변환
       areaSize = areaSize * 3.3;
     }
 
+    // API 요청
     var url = Uri.parse('http://192.168.50.69:8080/predict?areaSize=${areaSize}&lat=${vmPredictController.latData}&lng=${vmPredictController.lngData}&nearLat=${vmPredictController.latData}');
     var response = await http.readBytes(url);
+    // 응답
     double result = json.decode(utf8.decode(response));
 
     SharedPreferences ref = await SharedPreferences.getInstance();
-    print('결과 $result');
+    // 예측한 수확량으로 예상 수익을 알아보기 위해 값을 저장함.
     ref.setDouble('predict', result);
+
+    print('결과 $result');
 
     Get.defaultDialog(
       title: '결과',

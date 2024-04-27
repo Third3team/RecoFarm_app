@@ -1,13 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:latlong2/latlong.dart';
 
 /*
   Description : yield prediction view model
-  Date        : 2024.04.25 Thr
+  Date        : 2024.04.22 Thr
   Author      : LCY 
   Updates     : 
-	  2024.04.25 Thr by pdg
+	  2024.04.25 Thr by LCY
 		  -  code review :: 주석 
   Detail      : - 
 
@@ -18,21 +17,24 @@ class VMpredict extends GetxController{
   // radio button values
   bool? unitGroupValue = true;
   bool? groupValue = true;
-  // 검색지역 선택 여부
-  bool searchAreaValue = false;
-  // 선택 한 지역 
-  bool selecteAreaValue = true;
 
+  // 검색 선택 Radio
+  // bool searchAreaValue = false;
+  // 지역 선택 Radio
+  // bool selecteAreaValue = true;
+
+  // Radio Button Text
   String buttonText = '지역 선택';
+
+  // ActionSheet를 통해 선택된 지역의 이름
   String selectAreaPlaceName = '';
 
+  // 선택한 지역의 Index
   int selectValue = 0;
 
+  // 선택된 지역의 위도,경도
   double? latData;
   double? lngData;
-
-  double nearLat = 0;
-  // double naerLng = 0;
 
   // 기후  지역 List -> my SQL db 에 넣을 것. 
   List<String> placeList = [
@@ -53,6 +55,7 @@ class VMpredict extends GetxController{
     '경상남도 통영시',
   ];
 
+  // 지역들의 위도, 경도
   List<Map> placeListLocation = [
     { 'lat' : 37.2343060386837, 'lng' : 127.201357139725,}, // '경기도 용인시 처인구',
     { 'lat' : 36.3622851114392, 'lng' : 127.356257593324,}, // '대전광역시 유성구',
@@ -71,24 +74,32 @@ class VMpredict extends GetxController{
     { 'lat' : 34.8544448244005, 'lng' : 128.4331,}, //  '경상남도 통영시',
   ];
 
+  // 평수인지, 제곱미터인지 선택하는 Radio
   selectUnitRadio(bool? value) {
     unitGroupValue = value;
     update();
   }
 
+  // 검색인지, 지역선택인지 선택 Radio
   selectRadio(bool? value) {
     groupValue = value;
     buttonText = !groupValue! ? '검색' : '지역 선택';
     update();
   }
 
-
+  // 검색인지, 지역선택인지에 따라 같은 버튼에 행동이 바뀜.
   placeSearchAction(context) {
+    // 지역선택일때,
     if(groupValue!) {
       placeSelecteActionSheet(context);
     }
+    // 검색일때,
+    else {
+      // 미완
+    }
   }
 
+  // 지역 선택 ActionSheet
   placeSelecteActionSheet(context) {
     showCupertinoModalPopup(
       context: context,
@@ -102,15 +113,18 @@ class VMpredict extends GetxController{
               scrollController: FixedExtentScrollController(initialItem: selectValue),
               onSelectedItemChanged: (value) {
                 selectValue = value;
+                // 선택된 지역의 이름
                 selectAreaPlaceName = placeList[value];
+                // 선택된 지역의 위도
                 latData = placeListLocation[value]['lat'];
+                // 선택된 지역의 경도
                 lngData = placeListLocation[value]['lng'];
                 update();
               },
               children: List.generate(placeList.length, (index) {
                 return Center(
                   child: Text(
-                    '${placeList[index]}',
+                    placeList[index],
                     style: const TextStyle(
                       fontSize: 28
                     ),

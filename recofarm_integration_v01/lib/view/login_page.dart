@@ -1,11 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:new_recofarm_app/view/home_view_page.dart';
 import 'package:new_recofarm_app/view/mainview.dart';
 import 'package:new_recofarm_app/vm/sqlite_handler.dart';
 import 'package:new_recofarm_app/vm/user_firebase.dart';
@@ -22,6 +19,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 */
 
 class LoginPage extends StatefulWidget {
+  // ignore: use_super_parameters
   const LoginPage({Key? key}) : super(key: key);
 
   @override
@@ -294,7 +292,6 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                           easyLoginUserPwController.text.trim());
                       // 정보가 존재하지 않으면 간편 로그인이 실패한 경우이다.
                       if (response['result'] == false) {
-                        print('간편 로그인 실패');
                         // 조기 return을 통한 함수 종료.
                         return;
                       }
@@ -376,7 +373,7 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                         width: 50,
                       ),
                     ),
-                    Text(" 구글 아이디로 로그인",
+                    const Text(" 구글 아이디로 로그인",
                       style: TextStyle(
                       ),
                     )
@@ -404,8 +401,8 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
     String userPw =
         prefs.get('userPw') != null ? prefs.get('userPw').toString() : "";
 
-    print('ID: $userId');
-    print('PW: $userPw');
+    // print('ID: $userId');
+    // print('PW: $userPw');
 
     // 두 값이 전부 존재할때,
     if (userId != "" && userPw != "") {
@@ -432,7 +429,7 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
       return;
     }
 
-    print("-------- Firebase Login Success --------");
+    // print("-------- Firebase Login Success --------");
 
     // Firebase에 값이 존재, 따라서 정상적인 로그인.
     final prefs = await SharedPreferences.getInstance();
@@ -445,7 +442,7 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
     prefs.setString('userId', userId);
 
     // Login이 이루어지면 현재 존재하던 Page 전부를 없애고 이동.
-    Get.offAll(MainView());
+    Get.offAll(const MainView());
   }
 
   Future<void> signInWithGoogle() async {
@@ -473,10 +470,10 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
           userName = user?.displayName;
         });
 
-        print("Google user: $user");
+        // print("Google user: $user");
 
         // 페이지 이동
-        Get.offAll(MainView());
+        Get.offAll(const MainView());
       }
     } catch (error) {
       Fluttertoast.showToast(

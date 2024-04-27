@@ -1,7 +1,4 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
@@ -17,7 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
   * Updates     : 
   *   2024.04.20 by pdg
         - 기존 회원가입페이지 정상화 
-        - shared preference 로 아이디 패스워드 저장하여 mysql insert 에 넣기 . 
+        - shared preference 로 아이디 패스워드 저장하여 mysql insert 에 넣기.
 
 */
 class RegisterPage extends StatefulWidget {
@@ -85,11 +82,11 @@ class _RegisterPageState extends State<RegisterPage>
                 mainAxisAlignment: MainAxisAlignment.start,
                 
                 children: [
-                  SizedBox(height: 50,),
+                  const SizedBox(height: 50,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      SizedBox(width: 50,),
+                      const SizedBox(width: 50,),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: SizedBox(
@@ -245,7 +242,7 @@ class _RegisterPageState extends State<RegisterPage>
                       child: const Text('다음'),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 100,
                   )
                 ],
@@ -257,7 +254,7 @@ class _RegisterPageState extends State<RegisterPage>
     );
   }
 
-  // login Action
+  // register Action
   registerAction() async {
 
     _isloading = true;
