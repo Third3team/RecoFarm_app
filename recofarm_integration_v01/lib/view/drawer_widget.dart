@@ -9,10 +9,24 @@ import 'package:new_recofarm_app/view/predict_yield.dart';
 import 'package:new_recofarm_app/view/web_view_page.dart';
 import 'package:new_recofarm_app/vm/user_firebase.dart';
 
+/*
+  Description : Drawer widget
+  Date        : 2024.04.27 Sat
+  Author      : Forrest DongGeun Park. (PDG)
+  Updates     : 
+	  2024.04.27 Thr by pdg
+		  - 사용자가 글꼴을 바꿀수 있게끔 설정
+      - 
+  Detail      : - 
+
+*/
 class DrawerWidget extends StatelessWidget {
+  // 사용자 아이디를 constructor 로 받음.
   DrawerWidget({Key? key, required this.userId});
 
   final userId;
+
+  //사용자 이름과 이메일 
   String? userName;
   String? userEmail;
 
@@ -23,8 +37,17 @@ class DrawerWidget extends StatelessWidget {
         stream: UserFirebase().selectUserEqaulID(userId),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const Center(
-              child: Text('데이터가 없습니다.'),
+            return  Column(
+              // 데이터가 없을 때 처리 -> circular progress indicator 
+              children: 
+              
+                [
+                  CircularProgressIndicator(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  Text('데이터가 없습니다.'),
+                  ]
+              
             );
           }
           if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
@@ -47,9 +70,10 @@ class DrawerWidget extends StatelessWidget {
                 accountName: Padding(
                   padding: const EdgeInsets.fromLTRB(6, 30, 0, 0),
                   child: Text(
-                    '${userName ?? '사용자 이름'}님',
+                    '${userName ?? '사용자 이름'}님,'
+                    ,
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 15,
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                     ),
                   ),
@@ -72,25 +96,25 @@ class DrawerWidget extends StatelessWidget {
                 ),
               ),
               if (snapshot.hasData && snapshot.data!.docs.isNotEmpty)
-              ListTile(
-                leading: const Icon(
-                  Icons.edit,
-                  color: Colors.red,
+                ListTile(
+                  leading: const Icon(
+                    Icons.edit,
+                    color: Colors.red,
+                  ),
+                  title: const Text('회원정보 수정'),
+                  onTap: () {
+                    Get.to(
+                      edit(
+                        userId: snapshot.data!.docs[0]['userId'],
+                        userEmail: snapshot.data!.docs[0]['userEmail'],
+                        userPw: snapshot.data!.docs[0]['userPw'],
+                        userName: snapshot.data!.docs[0]['userName'],
+                        userNickName: snapshot.data!.docs[0]['userNickName'],
+                        userPhone: snapshot.data!.docs[0]['userPhone'],
+                      ),
+                    );
+                  },
                 ),
-                title: const Text('회원정보 수정'),
-                onTap: () {
-                  Get.to(
-                    edit(
-                      userId: snapshot.data!.docs[0]['userId'],
-                      userEmail: snapshot.data!.docs[0]['userEmail'],
-                      userPw: snapshot.data!.docs[0]['userPw'],
-                      userName: snapshot.data!.docs[0]['userName'],
-                      userNickName: snapshot.data!.docs[0]['userNickName'],
-                      userPhone: snapshot.data!.docs[0]['userPhone'],
-                    ),
-                  );
-                },
-              ),
               ListTile(
                 leading: const Icon(
                   // Icons.area_chart,
@@ -99,9 +123,7 @@ class DrawerWidget extends StatelessWidget {
                   color: Colors.cyan,
                 ),
                 title: const Text('수확량 예측'),
-                onTap: () => {
-                  Get.to(PredictYield())
-                },
+                onTap: () => {Get.to(PredictYield())},
               ),
               ListTile(
                 leading: const Icon(
