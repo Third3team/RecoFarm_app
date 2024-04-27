@@ -36,20 +36,15 @@ import com.springlec.base.service.usersDaoService;
  * 	2024.04.21 by pdg
  * 		- 내 농작지 조회 기능 api json 으로 출력하는 기능 추가  
  * 		- insert 기능 추가 
- *  2024.04.22 by pdg
+ *  2024.04.24 by pdg
+ *  
+ *  
 */
 
 @Controller
 public class myareaController {
 	@Autowired 
 	myareaDaoService service; //(수정필요)
-//	//Test 
-//	@GetMapping("/myareaInsert")
-//	public String test() throws Exception {
-//		System.out.println("** Root page start **");
-//		return "test";
-//		
-//	}
 	
 	@GetMapping("/predict")
 	public ResponseEntity<String> signup(

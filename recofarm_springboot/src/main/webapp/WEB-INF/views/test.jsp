@@ -5,11 +5,13 @@
 <!DOCTYPE html>
 <%
 	/*
-	 	Description 	:
+	 	Description 	: HOME
 	 		Details		:
-	 		Author		:
-	 		Date		:
-	 		Updates		:
+	 		Author		: Forrest Donggeun Park (pdg)
+	 		Date		: 2024. 04. 27
+	 		Updates		: 
+	 			- 2024.04.27 by pdg
+	 				- home 수
 	*/
 %>
 
@@ -19,6 +21,6 @@
 		<title>First Page</title>
 		</head>
 	<body>
-		<h2>MyBatis 주소록 리스트 </h2>
+		<h2> RecoFarm 홈페이지  </h2>
 	</body>
 </html>
