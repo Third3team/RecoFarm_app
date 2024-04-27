@@ -16,16 +16,18 @@ import com.springlec.base.service.usersDaoService;
 
 // 컨트롤러
 /*--------------------------------------
- * Description	: User controller - LogIn, signUp function 
+ * Description	: Home controller 
  * Author 		: PDG
  * Date 		: 2024.04.19
  * Update
  * 	2024.04.19 by pdg
  * 		- user sign up api 
+ *  202404.27 by pdg
+ *  	- user 는fire base 로 관리하므로 여기는home 으로 사용.
 */
 
 @Controller
-public class usersController {
+public class homeController {
 	@Autowired //Dao service interface 에 연결한다.
 	usersDaoService service; //(수정필요)
 	//Test 
