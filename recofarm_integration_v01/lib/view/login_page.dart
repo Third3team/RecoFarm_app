@@ -12,6 +12,15 @@ import 'package:new_recofarm_app/vm/user_firebase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+/* 
+	Description : 
+  Date : 2024.04.25 Thr 
+	Author : Forrest DongGeun Park. (PDG) 
+	Updates : 
+    2024.04.25 Thr by pdg - 
+	Detail : - 
+*/
+
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -212,7 +221,8 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
                                             contentPadding:
                                                 EdgeInsets.symmetric(
                                                     vertical: 20.0,
-                                                    horizontal: 20.0),
+                                                    horizontal: 20.0
+                                                    ),
                                             isDense: true,
                                             hintText: "간편 비밀번호를 입력하세요.",
                                             enabledBorder: OutlineInputBorder(

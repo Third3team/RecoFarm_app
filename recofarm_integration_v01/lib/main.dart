@@ -24,6 +24,11 @@ import 'view/home.dart';
         - splash screen 
       204.04.21 by pdg
         - 주석추가 
+
+      2024.04.27 by pdg
+        - 사용자가 테마를 변경하는 기능 드로워에 추가 
+          ~ 글꼴변경, 라이트, 다크 모드 변경 
+          
   *
 */
 
